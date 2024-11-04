@@ -1,6 +1,9 @@
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+class Base_model(DeclarativeBase):
+    __tablename__ = "tasks"
+    id : Mapped[int] = mapped_column(primary_key=True)
 
-from .base import Base
-
-class Task(Base):
-    __tablename__ = 'Task'
+class Task(Base_model):
+    name: Mapped[str]
+    description: Mapped[str]

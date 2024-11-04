@@ -1,7 +1,18 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
 from items import router as items_router
 from users.views import router as users_router
+from core.config import create_tables, delete_tables
+
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    await create_tables()
+    print("База готова")
+    yield
+    await delete_tables()
+    print("База очищена")
 
 app = FastAPI()
 app.include_router(items_router)
