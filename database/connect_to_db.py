@@ -19,10 +19,10 @@ def create_task(task: Task, session) -> None:
 
         # Проверяем, был ли объект сохранён в базе данных (по наличию ID, например)
         if task.id is not None:
-            print(f"User with ID {task.id} was successfully created.")
+            print(f"Task with ID {task.id} was successfully created.")
             return True
         else:
-            print("Failed to create user: ID was not assigned.")
+            print("Failed to create task: ID was not assigned.")
             return False
 
     except Exception as e:
@@ -44,7 +44,11 @@ def delete_task(name: str, session) -> Task:
 def select_task(name: str, session) -> list[Task]:
     statement = select(Task).where(Task.name == name)
     db_objects = session.scalars(statement).all()
-    return db_objects
+    if not db_objects:
+        print(f"No tasks found with login: {name}")
+        return True
+    print(f"Tasks with this name ({name}) already exist")
+    return False
 #------------------------------------------------------------
 def create_user(user: User, session) -> None:
     try:
@@ -76,6 +80,7 @@ def delete_user(login: str, session) -> Task:
     for db_object in db_objects:
         session.delete(db_object)
     return db_object
+
 def select_user(login: str, session) -> list[User]:
     statement = select(User).where(User.login == login)
     db_objects = session.scalars(statement).all()

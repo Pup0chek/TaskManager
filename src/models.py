@@ -7,4 +7,3 @@ class User_py(BaseModel):
 class Task_py(BaseModel):
     name: str
     description:str
-    tag: str
