@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from src.models import User_py
 from database.models import User
-from database.connect_to_db import create_user, Session
+from database.connect_to_db import  Session
+from database.actions.with_user import create_user
 
 
 registration_router = APIRouter(prefix='/registration', tags=['Registration'])
@@ -19,3 +20,5 @@ def post_registration(user:User_py):
             return {"message": "success"}
         except:
             return {"message": "error"}
+
+

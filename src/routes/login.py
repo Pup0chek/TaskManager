@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from src.models import User_py
-from database.connect_to_db import select_user, Session
+from database.connect_to_db import Session
+from database.actions.with_user import select_user
 
 login_router = APIRouter(prefix='/login', tags=['Login'])
 
@@ -16,3 +17,4 @@ def post_login(user:User_py):
                 return {"message": "success"}
         except Exception as e:
             return {"message": f"error: {e}"}
+

@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from src.models import Task_py
 from database.models import Task
-from database.connect_to_db import select_task, Session, create_task
+from database.connect_to_db import Session
+from database.actions.with_task import select_task, create_task
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
@@ -23,4 +24,10 @@ def post_task(task:Task_py):
         except:
             return {"message": f"Tasks with this name ({task.name}) already exist"}
 
+@task_router.put("/")
+def put_task(task: Task_py):
+    pass
 
+@task_router.delete("/")
+def delete_task(task: Task_py):
+    pass
