@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 
-class User(BaseModel):
-    name: str
+class User_py(BaseModel):
+    login: str
     password: str
 
-class Task(BaseModel):
+class Task_py(BaseModel):
     name: str
     description:str
     tag: str

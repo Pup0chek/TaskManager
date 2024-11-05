@@ -21,4 +21,4 @@ class User(Base):
     password: Mapped[str] = mapped_column(String(100))
 
     def __repr__(self) -> str:
-        return f"Task(id={self.id}, name={self.name}, password={self.password})"
+        return f"Task(id={self.id}, login={self.login}, password={self.password})"

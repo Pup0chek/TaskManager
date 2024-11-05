@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.models import Task
+from src.models import Task_py
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
@@ -8,5 +8,5 @@ def get_registration():
     pass
 
 @task_router.post("/")
-def post_registration(task:Task):
+def post_registration(task:Task_py):
     pass
