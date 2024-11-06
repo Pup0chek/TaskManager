@@ -4,6 +4,7 @@ from database.models import Task, User, Base
 from sqlalchemy import select
 
 engine = create_engine('sqlite:///C:/TaskManager/database.db')
+engine.echo = True
 
 Session = sessionmaker(engine)
 
