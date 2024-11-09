@@ -21,8 +21,28 @@ def create_user(user: User, session) -> None:
         print(f"An error occurred while creating user: {e}")
         return False
 
-def update_user(new_object: User, session) -> None:
-    session.merge(new_object)
+def update_user(login: str, password: str, session) -> bool:
+    try:
+        # Ищем задачу по имени
+        statement = select(User).where(User.login == login)
+        task = session.scalar(statement)
+
+        # Проверяем, существует ли задача
+        if not task:
+            print(f"Task with name '{login}' not found.")
+            return False
+
+        # Обновляем поля задачи
+        task.password = password
+        # Можно добавить другие поля для обновления здесь при необходимости
+
+        session.commit()
+        print(f"Task with name '{login}' was successfully updated.")
+        return True
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred while updating task: {e}")
+        return False
 
 def delete_user(login: str, session) -> Task:
     statement = select(login).where(User.login == login)
