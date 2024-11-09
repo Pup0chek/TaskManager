@@ -2,6 +2,7 @@ from database.models import Task
 from sqlalchemy import select
 
 
+
 def create_task(task: Task, session) -> None:
     try:
 
@@ -21,8 +22,28 @@ def create_task(task: Task, session) -> None:
         print(f"An error occurred while creating user: {e}")
         return False
 
-def update_task(new_object: Task, session) -> None:
-    session.merge(new_object)
+def update_task(name: str, description: str, session) -> bool:
+    try:
+        # Ищем задачу по имени
+        statement = select(Task).where(Task.name == name)
+        task = session.scalar(statement)
+
+        # Проверяем, существует ли задача
+        if not task:
+            print(f"Task with name '{name}' not found.")
+            return False
+
+        # Обновляем поля задачи
+        task.description = description
+        # Можно добавить другие поля для обновления здесь при необходимости
+
+        session.commit()
+        print(f"Task with name '{name}' was successfully updated.")
+        return True
+    except Exception as e:
+        session.rollback()
+        print(f"An error occurred while updating task: {e}")
+        return False
 
 def delete_task(name: str, session) -> Task:
     statement = select(Task).where(Task.name == name)

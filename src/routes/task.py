@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from src.models import Task_py
 from database.models import Task
 from database.connect_to_db import Session
-from database.actions.with_task import select_task, create_task
+from database.actions.with_task import select_task, create_task, update_task
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
@@ -26,7 +26,16 @@ def post_task(task:Task_py):
 
 @task_router.put("/")
 def put_task(task: Task_py):
-    pass
+    with Session() as session:
+        try:
+            # Используем обновлённую функцию для обновления задачи по имени и описанию
+            success = update_task(task.name, task.description, session)
+            if success:
+                return {"message": "success"}
+            else:
+                return {"message": f"Task with name '{task.name}' not found."}
+        except Exception as e:
+            return {"message": f"error: {e}"}
 
 @task_router.delete("/")
 def delete_task(task: Task_py):
