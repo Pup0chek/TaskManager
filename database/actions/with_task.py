@@ -65,5 +65,4 @@ def select_task_bool(name: str, session) -> list[Task]:
 def select_task(id: int, session) -> list[Task]:
     statement = select(Task).where(Task.id == id)
     db_objects = session.scalars(statement).one()
-    print(db_objects)
     return db_objects

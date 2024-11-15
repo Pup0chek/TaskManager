@@ -7,7 +7,7 @@ from database.actions.with_task import select_task_bool, select_task, create_tas
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
 @task_router.get("/{id}")
-def get_by_id(id: int):
+async def get_by_id(id: int):
     with Session() as session:
         try:
             success = select_task(id, session)
@@ -23,11 +23,11 @@ def get_by_id(id: int):
             return {"message": f"error: {e}"}
 
 @task_router.get("/")
-def get_task():
+async def get_task(limit: int=10):
     return {"message":"Welcome to task creation page"}
 
 @task_router.post("/")
-def post_task(task:Task_py):
+async def post_task(task:Task_py):
     with Session() as session:
         try:
             if select_task_bool(task.name, session):
@@ -41,7 +41,7 @@ def post_task(task:Task_py):
             return {"message": f"Tasks with this name ({task.name}) already exist"}
 
 @task_router.put("/")
-def put_task(task: Task_py):
+async def put_task(task: Task_py):
     with Session() as session:
         try:
             # Используем обновлённую функцию для обновления задачи по имени и описанию
@@ -54,5 +54,5 @@ def put_task(task: Task_py):
             return {"message": f"error: {e}"}
 
 @task_router.delete("/")
-def delete_task(task: Task_py):
+async def delete_task(task: Task_py):
     pass
