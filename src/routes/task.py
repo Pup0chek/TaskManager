@@ -2,9 +2,25 @@ from fastapi import APIRouter
 from src.models import Task_py
 from database.models import Task
 from database.connect_to_db import Session
-from database.actions.with_task import select_task, create_task, update_task
+from database.actions.with_task import select_task_bool, select_task, create_task, update_task
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
+
+@task_router.get("/{id}")
+def get_by_id(id: int):
+    with Session() as session:
+        try:
+            success = select_task(id, session)
+            if success:
+                return {
+                    "id": f"{success.id}",
+                    "name": f"{success.name}",
+                    "description": f"{success.description}"
+                }
+            else:
+                return {"message": f"Task with name '{success[0]}' not found."}
+        except Exception as e:
+            return {"message": f"error: {e}"}
 
 @task_router.get("/")
 def get_task():
@@ -14,7 +30,7 @@ def get_task():
 def post_task(task:Task_py):
     with Session() as session:
         try:
-            if select_task(task.name, session):
+            if select_task_bool(task.name, session):
                 try:
                     task1 = Task(name=task.name, description=task.description)
                     create_task(task1, session)

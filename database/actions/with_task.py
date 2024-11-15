@@ -53,7 +53,7 @@ def delete_task(name: str, session) -> Task:
         session.delete(db_object)
     return db_object
 
-def select_task(name: str, session) -> list[Task]:
+def select_task_bool(name: str, session) -> list[Task]:
     statement = select(Task).where(Task.name == name)
     db_objects = session.scalars(statement).all()
     if not db_objects:
@@ -61,3 +61,9 @@ def select_task(name: str, session) -> list[Task]:
         return True
     print(f"Tasks with this name ({name}) already exist")
     return False
+
+def select_task(id: int, session) -> list[Task]:
+    statement = select(Task).where(Task.id == id)
+    db_objects = session.scalars(statement).one()
+    print(db_objects)
+    return db_objects
