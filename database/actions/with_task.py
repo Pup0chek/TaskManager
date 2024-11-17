@@ -57,7 +57,7 @@ def select_task_bool(name: str, session) -> list[Task]:
     statement = select(Task).where(Task.name == name)
     db_objects = session.scalars(statement).all()
     if not db_objects:
-        print(f"No tasks found with login: {name}")
+        print(f"No tasks found with name: {name}")
         return True
     print(f"Tasks with this name ({name}) already exist")
     return False

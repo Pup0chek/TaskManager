@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 from src.models import Task_py
 from database.models import Task
 from src.Token import Token
@@ -8,20 +8,23 @@ from database.actions.with_task import select_task_bool, select_task, create_tas
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
 @task_router.get("/{id}")
-async def get_by_id(id: int):
+async def get_by_id(id: int, token:str = Header('Authorization')):
     with Session() as session:
         try:
             success = select_task(id, session)
-            if success:
-                return {
-                    "id": f"{success.id}",
-                    "name": f"{success.name}",
-                    "description": f"{success.description}"
-                }
-            else:
-                return {"message": f"Task with name '{success[0]}' not found."}
+            payload = Token.decode_token(token)
+            print(payload)
+            return f"{payload}"
+            # if success:
+            #     return {
+            #         "id": f"{success.id}",
+            #         "name": f"{success.name}",
+            #         "description": f"{success.description}"
+            #     }
+            # else:
+            #     return {"message": f"Task with name '{success[0]}' not found."}
         except Exception as e:
-            return {"message": f"error: {e}"}
+            raise e
 
 @task_router.get("/")
 async def get_task(limit: int=10):
