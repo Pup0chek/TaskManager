@@ -22,5 +22,3 @@ def post_registration(user: User_py):
             return {"message": f"{message}", "token":f"{token}"}
         except:
             return {"message": "error"}
-
-

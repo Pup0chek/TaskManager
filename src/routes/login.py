@@ -15,7 +15,9 @@ def post_login(user:User_py):
     with Session() as session:
         try:
             if select_user(user.login, session):
-                return {"message": "success"}
+                token = Token.create_token({"user": user.login, "password": user.password})
+                return {"message": f"success", "token": f"{token}"}
+            return {"message": f"There's no user with login '{user.login}'. Try different one"}
         except Exception as e:
             return {"message": f"error: {e}"}
 
