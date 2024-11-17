@@ -17,8 +17,9 @@ class Task(Base):
 
 class User(Base):
     __tablename__ = "Users"
-    login: Mapped[str] = mapped_column(String(30))
+    login: Mapped[str] = mapped_column(String(30), unique=True)
     password: Mapped[str] = mapped_column(String(100))
 
     def __repr__(self) -> str:
         return f"Task(id={self.id}, login={self.login}, password={self.password})"
+

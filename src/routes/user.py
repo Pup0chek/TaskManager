@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from src.models import User_py
 from database.connect_to_db import Session
 from database.actions.with_user import update_user
+from src.Token import Token
 
 user_router = APIRouter(prefix="/user", tags=["User"])
 

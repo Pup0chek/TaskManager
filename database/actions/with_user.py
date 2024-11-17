@@ -4,22 +4,19 @@ from sqlalchemy import select
 
 def create_user(user: User, session) -> None:
     try:
-
         session.add(user)
         session.commit()
         session.refresh(user)
 
         if user.id is not None:
-            print(f"User with ID {user.id} was successfully created.")
-            return True
+            return f"User with ID {user.id} was successfully created."
         else:
-            print("Failed to create user: ID was not assigned.")
-            return False
+            return "Failed to create user: ID was not assigned."
 
     except Exception as e:
         session.rollback()
-        print(f"An error occurred while creating user: {e}")
-        return False
+        return f"An error occurred while creating user: {e}"
+
 
 def update_user(login: str, password: str, session) -> bool:
     try:

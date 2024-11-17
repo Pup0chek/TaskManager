@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from src.models import User_py
 from database.connect_to_db import Session
 from database.actions.with_user import select_user
+from src.Token import Token
 
 login_router = APIRouter(prefix='/login', tags=['Login'])
 
