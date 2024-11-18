@@ -16,17 +16,16 @@ async def get_by_id(id: int, authorization:str = Header(None)):
             if authorization.startswith("Bearer "):
                 token = authorization[7:]
                 print(token)
-            success = select_task(id, session)
             payload = Token.decode_token(token)
-            return f"{payload}"
-            # if success:
-            #     return {
-            #         "id": f"{success.id}",
-            #         "name": f"{success.name}",
-            #         "description": f"{success.description}"
-            #     }
-            # else:
-            #     return {"message": f"Task with name '{success[0]}' not found."}
+            success = select_task(id, session)
+            if success:
+                return {
+                    "id": f"{success.id}",
+                    "name": f"{success.name}",
+                    "description": f"{success.description}"
+                }
+            else:
+                return {"message": f"Task with name '{success[0]}' not found."}
         except Exception as e:
             raise e
 
