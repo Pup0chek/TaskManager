@@ -16,7 +16,6 @@ class Token:
     @staticmethod
     def decode_token(token: str):
         try:
-
             payload = jwt.decode(token, key='hahahahhahaa', algorithms=['HS256'])
             print(payload)
             #data = payload.get('user')

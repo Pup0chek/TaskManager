@@ -22,5 +22,13 @@ app.include_router(user_router)
 def get_admin(token:str = Depends(role_required('admin'))):
     return {"message": "This is the admin resource", "user": f'{token}'}
 
+@app.get('/user')
+def get_user(token:str = Depends(role_required('user'))):
+    return {"message": "This is the user resource", "user": f'{token}'}
+
+@app.get('/guest')
+def get_user(token:str = Depends(role_required('guest'))):
+    return {"message": "This is the guest resource", "user": f'{token}'}
+
 if __name__ == "__main__":
     uvicorn.run('main:app', reload=True)
