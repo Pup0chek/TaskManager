@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.models import User_py
+from src.models import User_login
 from database.connect_to_db import Session
 from database.actions.with_user import select_user, login
 from src.Token import Token
@@ -11,7 +11,7 @@ def get_login():
     return {"message":"Welcome to login page!"}
 
 @login_router.post("/")
-def post_login(user:User_py):
+def post_login(user:User_login):
     with Session() as session:
         try:
             if select_user(user.login, session):

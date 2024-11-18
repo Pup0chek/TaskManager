@@ -14,7 +14,7 @@ def get_registration():
 
 @registration_router.post("/")
 def post_registration(user: User_py):
-    user1 = User(login=user.login, password=user.password)
+    user1 = User(login=user.login, password=user.password, role=user.role)
     with Session() as session:
         try:
             token = Token.create_token({'login': user.login, 'password':user.password})
