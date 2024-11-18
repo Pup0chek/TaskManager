@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Header
+from fastapi import APIRouter, Header, HTTPException
 from src.models import Task_py
 from database.models import Task
 from src.Token import Token
@@ -8,12 +8,16 @@ from database.actions.with_task import select_task_bool, select_task, create_tas
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
 @task_router.get("/{id}")
-async def get_by_id(id: int, token:str = Header('Authorization')):
+async def get_by_id(id: int, authorization:str = Header(None)):
+    if authorization is None:
+        raise HTTPException(status_code=400, detail="Authorization token is required")
     with Session() as session:
         try:
+            if authorization.startswith("Bearer "):
+                token = authorization[7:]
+                print(token)
             success = select_task(id, session)
             payload = Token.decode_token(token)
-            print(payload)
             return f"{payload}"
             # if success:
             #     return {

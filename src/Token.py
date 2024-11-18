@@ -17,18 +17,17 @@ class Token:
     def decode_token(token: str):
         try:
 
-            payload = jwt.decode(token, key='hahahahhahaa')
+            payload = jwt.decode(token, key='hahahahhahaa', algorithms=['HS256'])
             print(payload)
-            data = payload.get('user')
-            print(data)
-            return data
-        except jwt.ExpiredSignatureError:
+            #data = payload.get('user')
+            return payload
+        except jwt.ExpiredSignatureError as e:
             raise HTTPException(
                 status_code=401,
-                detail="Token has expired"
+                detail=f"{e}"
             )
-        except jwt.InvalidTokenError:
+        except jwt.InvalidTokenError as e:
             raise HTTPException(
                 status_code=401,
-                detail="Invalid token error"
+                detail=f"{e}"
             )
