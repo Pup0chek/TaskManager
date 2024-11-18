@@ -57,3 +57,8 @@ def select_user(login: str, session) -> list[User]:
         return False
     print(db_objects)
     return True
+def login(login:str, password:str, session) -> bool:
+    user = session.execute(select(User).where(User.login == login)).scalar_one_or_none()
+    if password == user.password:
+        return True
+    return False
