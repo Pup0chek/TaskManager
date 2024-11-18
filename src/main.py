@@ -2,10 +2,10 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.params import Depends
 
-from routes.registration import registration_router
-from routes.login import login_router
-from routes.task import task_router
-from routes.user import user_router
+from src.routes.registration import registration_router
+from src.routes.login import login_router
+from src.routes.task import task_router
+from src.routes.user import user_router
 from src.models import User_login
 from src.roles import role_required
 

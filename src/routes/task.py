@@ -1,6 +1,7 @@
 
 from fastapi import APIRouter, Header, HTTPException
-
+from fastapi.openapi.models import Response
+from starlette import status
 
 from src.models import Task_py
 from database.models import Task
@@ -13,7 +14,6 @@ task_router = APIRouter(prefix='/task', tags=['Task'])
 class CustomException(HTTPException):
     def __init__(self, detail: str, status_code: int = 401):
         super().__init__(status_code=status_code, detail=detail)
-
 
 @task_router.get("/{id}")
 async def get_by_id(id: int, authorization:str = Header(None)):
