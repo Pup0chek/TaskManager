@@ -31,3 +31,8 @@ class Token:
                 status_code=401,
                 detail=f"{e}"
             )
+    @staticmethod
+    def get_role(token:str):
+        payload = jwt.decode(token, key='hahahahhahaa', algorithms=['HS256'])
+        role= payload.get('role')
+        return role
