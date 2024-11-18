@@ -5,7 +5,6 @@ from sqlalchemy import select
 
 def create_task(task: Task, session) -> None:
     try:
-
         session.add(task)
         session.commit()
         session.refresh(task)

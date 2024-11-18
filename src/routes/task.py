@@ -15,7 +15,6 @@ async def get_by_id(id: int, authorization:str = Header(None)):
         try:
             if authorization.startswith("Bearer "):
                 token = authorization[7:]
-                print(token)
             payload = Token.decode_token(token)
             success = select_task(id, session)
             if success:
@@ -34,18 +33,21 @@ async def get_task(limit: int=10):
     return {"message":"Welcome to task creation page"}
 
 @task_router.post("/")
-async def post_task(task:Task_py):
+async def post_task(task:Task_py, authorization: str = Header(...)):
     with Session() as session:
         try:
-            if select_task_bool(task.name, session):
-                try:
-                    task1 = Task(name=task.name, description=task.description)
-                    create_task(task1, session)
-                    return {"message": "success"}
-                except Exception as e:
-                    return {'message': f"error:{e}"}
-        except:
-            return {"message": f"Tasks with this name ({task.name}) already exist"}
+            if authorization.startswith("Bearer "):
+                token = authorization[7:]
+            payload = Token.decode_token(token)
+            print(payload)
+            try:
+                task1 = Task(name=task.name, description=task.description)
+                create_task(task1, session)
+                return {"message": "success"}
+            except Exception as e:
+                return {'message': f"error:{e}"}
+        except HTTPException as e:
+            raise e
 
 @task_router.put("/")
 async def put_task(task: Task_py):
