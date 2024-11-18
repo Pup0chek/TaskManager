@@ -3,7 +3,6 @@ from starlette import status
 from src.Token import Token
 
 
-from src.models import User_login
 
 
 def role_required(role: str):
