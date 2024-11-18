@@ -7,10 +7,13 @@ from database.actions.with_task import select_task_bool, select_task, create_tas
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
+class CustomException(HTTPException):
+    def __init__(self, detail: str, status_code: int = 401):
+        super().__init__(status_code=status_code, detail=detail)
 @task_router.get("/{id}")
 async def get_by_id(id: int, authorization:str = Header(None)):
     if authorization is None:
-        raise HTTPException(status_code=400, detail="Authorization token is required")
+        raise CustomException(status_code=401, detail="Where's your token?")
     with Session() as session:
         try:
             if authorization.startswith("Bearer "):
