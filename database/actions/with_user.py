@@ -62,3 +62,7 @@ def login(login:str, password:str, session) -> bool:
     if password == user.password:
         return True
     return False
+
+def get_role_by_login(login:str, session) -> str:
+    role = session.execute(select(User).where(User.login == login)).scalar_one_or_none()
+    return role.role
