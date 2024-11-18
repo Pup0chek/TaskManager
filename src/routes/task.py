@@ -1,15 +1,20 @@
+
 from fastapi import APIRouter, Header, HTTPException
+
+
 from src.models import Task_py
 from database.models import Task
 from src.Token import Token
 from database.connect_to_db import Session
-from database.actions.with_task import select_task_bool, select_task, create_task, update_task
+from database.actions.with_task import select_task_bool, select_task, create_task, update_task, owner
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
 class CustomException(HTTPException):
     def __init__(self, detail: str, status_code: int = 401):
         super().__init__(status_code=status_code, detail=detail)
+
+
 @task_router.get("/{id}")
 async def get_by_id(id: int, authorization:str = Header(None)):
     if authorization is None:
@@ -19,15 +24,28 @@ async def get_by_id(id: int, authorization:str = Header(None)):
             if authorization.startswith("Bearer "):
                 token = authorization[7:]
             payload = Token.decode_token(token)
-            success = select_task(id, session)
-            if success:
-                return {
-                    "id": f"{success.id}",
-                    "name": f"{success.name}",
-                    "description": f"{success.description}"
-                }
-            else:
-                return {"message": f"Task with name '{success[0]}' not found."}
+            owner1 = payload.get("user")
+            try:
+                if owner(id, owner1, session):
+                    success = select_task(id, session)
+                    if success:
+                        return {
+                            "id": f"{success.id}",
+                            "name": f"{success.name}",
+                            "description": f"{success.description}"
+                        }
+                    else:
+                        return {"message": f"Task with name '{success[0]}' not found."}
+                else:
+                    raise HTTPException(
+                        status_code=401,
+                        detail=f"Permission denied"
+                    )
+            except Exception as e:
+                raise HTTPException(
+                    status_code=401,
+                    detail=f"{e}"
+                )
         except Exception as e:
             raise e
 
@@ -65,6 +83,8 @@ async def put_task(task: Task_py):
                 return {"message": f"Task with name '{task.name}' not found."}
         except Exception as e:
             return {"message": f"error: {e}"}
+
+
 
 @task_router.delete("/")
 async def delete_task(task: Task_py):

@@ -65,3 +65,10 @@ def select_task(id: int, session) -> list[Task]:
     statement = select(Task).where(Task.id == id)
     db_objects = session.scalars(statement).one()
     return db_objects
+def owner(id: int, owner:str,  session) -> bool:
+    statement = select(Task).where(Task.id == id)
+    db_objects = session.scalars(statement).one()
+    if db_objects.owner == owner:
+        return True
+    else:
+        return False
