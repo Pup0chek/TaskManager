@@ -39,9 +39,10 @@ async def post_task(task:Task_py, authorization: str = Header(...)):
             if authorization.startswith("Bearer "):
                 token = authorization[7:]
             payload = Token.decode_token(token)
+            owner = payload.get("user")
             print(payload)
             try:
-                task1 = Task(name=task.name, description=task.description)
+                task1 = Task(name=task.name, description=task.description, owner=owner)
                 create_task(task1, session)
                 return {"message": "success"}
             except Exception as e:
