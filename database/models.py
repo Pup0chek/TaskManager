@@ -1,7 +1,7 @@
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import String
+from sqlalchemy import String, ForeignKey
 
 class Base(DeclarativeBase):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -24,4 +24,11 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"Task(id={self.id}, login={self.login}, password={self.password})"
+
+class Token_validation(Base):
+    __tablename__ = "Token_validation"
+    user_id: Mapped[str] = mapped_column(String(30), ForeignKey("Users.id"))
+    jwt: Mapped[str] = mapped_column(String(100))
+
+
 
