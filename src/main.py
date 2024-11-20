@@ -1,6 +1,8 @@
 import uvicorn
 from fastapi import FastAPI, Header
+from fastapi.openapi.utils import get_openapi
 from fastapi.params import Depends
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.routes.registration import registration_router
 from src.routes.login import login_router
@@ -15,6 +17,7 @@ app.include_router(registration_router)
 app.include_router(login_router)
 app.include_router(task_router)
 app.include_router(user_router)
+
 
 
 #course
@@ -37,6 +40,30 @@ def post_refresh_token(token:Refresh):
         return Token.refresh(token.refresh_token)
     except Exception as e:
         raise e
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Custom API with Authorization",
+        version="1.0.0",
+        description="This is a custom OpenAPI schema with Authorization support",
+        routes=app.routes,
+    )
+    openapi_schema["components"]["securitySchemes"] = {
+        "bearerAuth": {
+            "type": "http",
+            "scheme": "bearer"
+        }
+    }
+    for path in openapi_schema["paths"]:
+        for method in openapi_schema["paths"][path]:
+            openapi_schema["paths"][path][method]["security"] = [{"bearerAuth": []}]
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+# Подключаем кастомное OpenAPI к приложению
+app.openapi = custom_openapi
 
 
 if __name__ == "__main__":

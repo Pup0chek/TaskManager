@@ -1,7 +1,9 @@
-
 from fastapi import APIRouter, Header, HTTPException
 from fastapi.openapi.models import Response
 from starlette import status
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 from src.models import Task_py
 from database.models import Task
@@ -16,13 +18,13 @@ class CustomException(HTTPException):
         super().__init__(status_code=status_code, detail=detail)
 
 @task_router.get("/{id}")
-async def get_by_id(id: int, authorization:str = Header(None)):
-    if authorization is None:
-        raise CustomException(status_code=401, detail="Where's your token?")
+async def get_by_id(id: int, Authorization: str = Header(None)):
+    # if Authorization is None:
+    #     raise CustomException(status_code=401, detail="Where's your token?")
     with Session() as session:
         try:
-            if authorization.startswith("Bearer "):
-                token = authorization[7:]
+            if Authorization.startswith("Bearer "):
+                token = Authorization[7:]
             payload = Token.decode_token(token)
             owner1 = payload.get("user")
             try:
@@ -38,7 +40,7 @@ async def get_by_id(id: int, authorization:str = Header(None)):
                         return {"message": f"Task with name '{success[0]}' not found."}
                 else:
                     raise HTTPException(
-                        status_code=401,
+                        status_code=403,
                         detail=f"Permission denied"
                     )
             except Exception as e:
