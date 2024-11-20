@@ -50,7 +50,7 @@ class Token:
             username = payload.get("user")
             if username is None:
                 raise HTTPException(status_code=403, detail="Could not validate credentials")
-            new_access_token = Token.create_access_token(data={"sub": username})
+            new_access_token = Token.create_access_token(data={"user": username})
             return {"access_token": new_access_token}
         except Exception as e:
             raise HTTPException(status_code=403, detail=f"{e}")
