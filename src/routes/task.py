@@ -3,8 +3,7 @@ from fastapi.openapi.models import Response
 from starlette import status
 from fastapi.middleware.cors import CORSMiddleware
 
-
-
+from database.actions.with_token import valid_token
 from src.models import Task_py
 from database.models import Task
 from src.Token import Token
@@ -19,8 +18,8 @@ class CustomException(HTTPException):
 
 @task_router.get("/{id}")
 async def get_by_id(id: int, Authorization: str = Header(None)):
-    # if Authorization is None:
-    #     raise CustomException(status_code=401, detail="Where's your token?")
+    if Authorization is None:
+        raise CustomException(status_code=401, detail="Where's your token?")
     with Session() as session:
         try:
             if Authorization.startswith("Bearer "):
@@ -29,15 +28,18 @@ async def get_by_id(id: int, Authorization: str = Header(None)):
             owner1 = payload.get("user")
             try:
                 if owner(id, owner1, session):
-                    success = select_task(id, session)
-                    if success:
-                        return {
-                            "id": f"{success.id}",
-                            "name": f"{success.name}",
-                            "description": f"{success.description}"
-                        }
+                    if valid_token(owner1, token, session):
+                        success = select_task(id, session)
+                        if success:
+                            return {
+                                "id": f"{success.id}",
+                                "name": f"{success.name}",
+                                "description": f"{success.description}"
+                            }
+                        else:
+                            return {"message": f"Task with name '{success[0]}' not found."}
                     else:
-                        return {"message": f"Task with name '{success[0]}' not found."}
+                        return {"message": "Your token is old"}
                 else:
                     raise HTTPException(
                         status_code=403,
