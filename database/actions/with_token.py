@@ -8,7 +8,7 @@ def add_token(user:str, token:str, session):
 
         # Проверяем, существует ли задача
         if not id1:
-            token = Token_validation(user_id=id, jwt=token)
+            token = Token_validation(user= user, jwt=token)
             return create_token(token, session)
         else:
             id.jwt = token
