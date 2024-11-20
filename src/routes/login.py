@@ -17,8 +17,9 @@ def post_login(user:User_login):
             if select_user(user.login, session):
                 if login(user.login, user.password, session):
                     role = get_role_by_login(user.login, session)
-                    token = Token.create_token({"user": user.login, "role": role})
-                    return {"message": f"success", "token": f"{token}"}
+                    token_access = Token.create_access_token({"user": user.login, "role": role})
+                    token_refresh = Token.create_refresh_token({"user": user.login, "role": role})
+                    return {"message": f"success", "access_token": f"{token_access}", "refresh_token": f"{token_refresh}"}
                 else:
                     return {"message":"Password is incorrect"}
             return {"message": f"There's no user with login '{user.login}'. Try different one"}

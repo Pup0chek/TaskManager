@@ -1,5 +1,5 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Header
 from fastapi.params import Depends
 
 from src.routes.registration import registration_router
@@ -30,7 +30,9 @@ def get_user(token:str = Depends(role_required('user'))):
 def get_user(token:str = Depends(role_required('guest'))):
     return {"message": "This is the guest resource", "user": f'{token}'}
 
-
+@app.post('/refresh')
+def post_refresh_token(authorization:str = Header(...)):
+    pass
 
 
 if __name__ == "__main__":
