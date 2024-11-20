@@ -1,14 +1,13 @@
 import jwt
 from fastapi import HTTPException
 from datetime import datetime, timedelta
+from database.actions.with_token import add_token
 
 
 class Token:
     @staticmethod
     def create_access_token(data: dict, expiration_minutes: int = 60) -> str:
         expiration_time = datetime.utcnow() + timedelta(minutes=expiration_minutes)
-
-        # Добавляем 'exp' в payload, чтобы указать время жизни токена
         data.update({"exp": expiration_time})
         token = jwt.encode(payload=data, key='hahahahhahaa')
         return token

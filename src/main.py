@@ -1,8 +1,9 @@
 import uvicorn
-from fastapi import FastAPI, Header
+from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from fastapi.params import Depends
-from fastapi.middleware.cors import CORSMiddleware
+from database.connect_to_db import Session
+from database.actions.with_token import add_token
 
 from src.routes.registration import registration_router
 from src.routes.login import login_router
@@ -36,10 +37,14 @@ def get_user(token: str = Depends(role_required('guest'))):
 
 @app.post('/refresh')
 def post_refresh_token(token:Refresh):
-    try:
-        return Token.refresh(token.refresh_token)
-    except Exception as e:
-        raise e
+    with Session() as session:
+        try:
+            token = Token.refresh(token.refresh_token)['access_token']
+            payload = Token.decode_token(token).get('user')
+            add_token(payload, token, session)
+            return {"message":"refreshed"}
+        except Exception as e:
+            raise e
 
 def custom_openapi():
     if app.openapi_schema:

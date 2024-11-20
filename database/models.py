@@ -27,7 +27,7 @@ class User(Base):
 
 class Token_validation(Base):
     __tablename__ = "Token_validation"
-    user_id: Mapped[str] = mapped_column(String(30), ForeignKey("Users.id"))
+    user: Mapped[str] = mapped_column(String(30), ForeignKey("Users.login"))
     jwt: Mapped[str] = mapped_column(String(100))
 
 
