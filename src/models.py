@@ -12,3 +12,6 @@ class User_login(BaseModel):
 class Task_py(BaseModel):
     name: str
     description:str
+
+class Refresh(BaseModel):
+    refresh_token: str

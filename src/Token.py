@@ -42,3 +42,15 @@ class Token:
         data.update({"exp": expiration_time})
         token = jwt.encode(payload=data, key='hahahahhahaa')
         return token
+
+    @staticmethod
+    def refresh(token: str):
+        try:
+            payload = jwt.decode(token, 'hahahahhahaa', algorithms=['HS256'])
+            username = payload.get("user")
+            if username is None:
+                raise HTTPException(status_code=403, detail="Could not validate credentials")
+            new_access_token = Token.create_access_token(data={"sub": username})
+            return {"access_token": new_access_token}
+        except Exception as e:
+            raise HTTPException(status_code=403, detail=f"{e}")
