@@ -42,7 +42,7 @@ def post_refresh_token(token:Refresh):
             token = Token.refresh(token.refresh_token)['access_token']
             payload = Token.decode_token(token).get('user')
             add_token(payload, token, session)
-            return {"message":"refreshed"}
+            return {"new_access_token":f"{token}"}
         except Exception as e:
             raise e
 

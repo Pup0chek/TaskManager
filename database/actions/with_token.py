@@ -1,4 +1,4 @@
-from database.models import Task, User, Token_validation
+from database.models import Token_validation
 from sqlalchemy import select
 
 def add_token(user:str, token:str, session):
