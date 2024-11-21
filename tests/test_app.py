@@ -34,7 +34,7 @@ def mock_get_role_by_login():
 
 @pytest.fixture
 def mock_token_creation():
-    with patch("src.Token.Token.create_access_token") as mock_create_token:
+    with patch("src.Token.Token.create_token") as mock_create_token:
         mock_create_token.return_value = mock_token
         yield mock_create_token
 
