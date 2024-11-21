@@ -66,12 +66,14 @@ async def post_task(task:Task_py, authorization: str = Header(...)):
             payload = Token.decode_token(token)
             owner = payload.get("user")
             print(payload)
-            try:
-                task1 = Task(name=task.name, description=task.description, owner=owner)
-                create_task(task1, session)
-                return {"message": "success"}
-            except Exception as e:
-                return {'message': f"error:{e}"}
+            if valid_token(owner, token, session):
+                try:
+                    task1 = Task(name=task.name, description=task.description, owner=owner)
+                    create_task(task1, session)
+                    return {"message": "success"}
+                except Exception as e:
+                    return {'message': f"error:{e}"}
+            return {"message": "Your token is old"}
         except HTTPException as e:
             raise e
 
