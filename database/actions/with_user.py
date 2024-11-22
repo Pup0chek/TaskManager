@@ -42,8 +42,8 @@ def update_user(login: str, password: str, session) -> bool:
         return False
 
 def delete_user(login: str, session) -> Task:
-    statement = select(login).where(User.login == login)
-    db_objects = session.scalars(statement).all()
+    statement = select(User).where(User.login == login)
+    db_objects = session.scalars(statement).one()
 
     for db_object in db_objects:
         session.delete(db_object)
