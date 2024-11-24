@@ -1,16 +1,17 @@
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from database.models import Task, User, Base
 from sqlalchemy import select
 
-engine = create_engine('sqlite:///C:/TaskManager/database.db')
+engine = create_async_engine('sqlite+aiosqlite:///C:/TaskManager/database.db', echo=True)
 engine.echo = True
 
-Session = sessionmaker(engine)
+async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
-
-def create_db_and_tables() -> None:
-    Base.metadata.create_all(engine)
+async def create_db_and_tables() -> None:
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 
 

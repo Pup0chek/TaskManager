@@ -1,8 +1,7 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.openapi.utils import get_openapi
-from fastapi.params import Depends
-from database.connect_to_db import Session
+from database.connect_to_db import async_session
 from database.actions.with_token import add_token
 
 from src.routes.registration import registration_router
@@ -20,31 +19,32 @@ app.include_router(task_router)
 app.include_router(user_router)
 
 
-
-#course
-
 @app.get('/admin')
-def get_admin(token:str = Depends(role_required('admin'))):
+async def get_admin(token: str = Depends(role_required('admin'))):
     return {"message": "This is the admin resource", "user": f'{token}'}
 
+
 @app.get('/user')
-def get_user(token:str = Depends(role_required('user'))):
+async def get_user(token: str = Depends(role_required('user'))):
     return {"message": "This is the user resource", "user": f'{token}'}
 
+
 @app.get('/guest')
-def get_user(token: str = Depends(role_required('guest'))):
+async def get_guest(token: str = Depends(role_required('guest'))):
     return {"message": "This is the guest resource", "user": f'{token}'}
 
+
 @app.post('/refresh')
-def post_refresh_token(token:Refresh):
-    with Session() as session:
+async def post_refresh_token(token: Refresh):
+    async with async_session() as session:
         try:
-            token = Token.refresh(token.refresh_token)['access_token']
-            payload = Token.decode_token(token).get('user')
-            add_token(payload, token, session)
-            return {"message":"refreshed"}
+            access_token = Token.refresh(token.refresh_token)['access_token']
+            payload = Token.decode_token(access_token).get('user')
+            await add_token(payload, access_token, session)
+            return {"message": "Token refreshed successfully"}
         except Exception as e:
-            raise e
+            raise HTTPException(status_code=400, detail=f"Error refreshing token: {e}")
+
 
 def custom_openapi():
     if app.openapi_schema:
@@ -67,7 +67,6 @@ def custom_openapi():
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
-# Подключаем кастомное OpenAPI к приложению
 app.openapi = custom_openapi
 
 

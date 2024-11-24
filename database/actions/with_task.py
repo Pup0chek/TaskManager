@@ -1,13 +1,13 @@
 from database.models import Task
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
-
-def create_task(task: Task, session) -> None:
+async def create_task(task: Task, session: AsyncSession) -> bool:
     try:
         session.add(task)
-        session.commit()
-        session.refresh(task)
+        await session.commit()
+        await session.refresh(task)
 
         if task.id is not None:
             print(f"Task with ID {task.id} was successfully created.")
@@ -15,60 +15,93 @@ def create_task(task: Task, session) -> None:
         else:
             print("Failed to create task: ID was not assigned.")
             return False
-
     except Exception as e:
-        session.rollback()
-        print(f"An error occurred while creating user: {e}")
+        await session.rollback()
+        print(f"An error occurred while creating task: {e}")
         return False
 
-def update_task(name: str, description: str, session) -> bool:
-    try:
-        # Ищем задачу по имени
-        statement = select(Task).where(Task.name == name)
-        task = session.scalar(statement)
 
-        # Проверяем, существует ли задача
+async def update_task(name: str, description: str, session: AsyncSession) -> bool:
+    try:
+        statement = select(Task).where(Task.name == name)
+        task = await session.scalar(statement)
+
         if not task:
             print(f"Task with name '{name}' not found.")
             return False
 
-        # Обновляем поля задачи
         task.description = description
-        # Можно добавить другие поля для обновления здесь при необходимости
-
-        session.commit()
+        await session.commit()
         print(f"Task with name '{name}' was successfully updated.")
         return True
     except Exception as e:
-        session.rollback()
+        await session.rollback()
         print(f"An error occurred while updating task: {e}")
         return False
 
-def delete_task(name: str, session) -> Task:
-    statement = select(Task).where(Task.name == name)
-    db_objects = session.scalars(statement).all()
 
-    for db_object in db_objects:
-        session.delete(db_object)
-    return db_object
+async def delete_task(name: str, session: AsyncSession) -> bool:
+    try:
+        statement = select(Task).where(Task.name == name)
+        tasks = await session.scalars(statement)
+        tasks = tasks.all()
 
-def select_task_bool(name: str, session) -> list[Task]:
-    statement = select(Task).where(Task.name == name)
-    db_objects = session.scalars(statement).all()
-    if not db_objects:
-        print(f"No tasks found with name: {name}")
+        if not tasks:
+            print(f"No tasks found with name: {name}")
+            return False
+
+        for task in tasks:
+            await session.delete(task)
+        await session.commit()
+        print(f"Tasks with name '{name}' have been deleted.")
         return True
-    print(f"Tasks with this name ({name}) already exist")
-    return False
+    except Exception as e:
+        await session.rollback()
+        print(f"An error occurred while deleting tasks: {e}")
+        return False
 
-def select_task(id: int, session) -> list[Task]:
-    statement = select(Task).where(Task.id == id)
-    db_objects = session.scalars(statement).one()
-    return db_objects
-def owner(id: int, owner:str,  session) -> bool:
-    statement = select(Task).where(Task.id == id)
-    db_objects = session.scalars(statement).one()
-    if db_objects.owner == owner:
-        return True
-    else:
+
+async def select_task_bool(name: str, session: AsyncSession) -> bool:
+    try:
+        statement = select(Task).where(Task.name == name)
+        tasks = await session.scalars(statement)
+        tasks = tasks.all()
+
+        if not tasks:
+            print(f"No tasks found with name: {name}")
+            return True
+        print(f"Tasks with this name ({name}) already exist")
+        return False
+    except Exception as e:
+        print(f"An error occurred while selecting tasks: {e}")
+        return False
+
+
+async def select_task(id: int, session: AsyncSession) -> Task:
+    try:
+        statement = select(Task).where(Task.id == id)
+        task = await session.scalar(statement)
+
+        if not task:
+            print(f"No task found with ID: {id}")
+            return None
+
+        return task
+    except Exception as e:
+        print(f"An error occurred while selecting task: {e}")
+        return None
+
+
+async def owner(id: int, owner: str, session: AsyncSession) -> bool:
+    try:
+        statement = select(Task).where(Task.id == id)
+        task = await session.scalar(statement)
+
+        if not task:
+            print(f"No task found with ID: {id}")
+            return False
+
+        return task.owner == owner
+    except Exception as e:
+        print(f"An error occurred while verifying owner: {e}")
         return False
