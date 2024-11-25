@@ -40,20 +40,18 @@ async def update_task(name: str, description: str, session: AsyncSession) -> boo
         return False
 
 
-async def delete_task(name: str, session: AsyncSession) -> bool:
+async def delete_task(id: int, session: AsyncSession) -> bool:
     try:
-        statement = select(Task).where(Task.name == name)
-        tasks = await session.scalars(statement)
-        tasks = tasks.all()
+        statement = select(Task).where(Task.id == id)
+        task = await session.scalar(statement)
 
-        if not tasks:
-            print(f"No tasks found with name: {name}")
+        if not task:
+            print(f"No tasks found with id: {id}")
             return False
 
-        for task in tasks:
-            await session.delete(task)
+        await session.delete(task)
         await session.commit()
-        print(f"Tasks with name '{name}' have been deleted.")
+        print(f"Tasks with id '{id}' have been deleted.")
         return True
     except Exception as e:
         await session.rollback()
@@ -91,6 +89,20 @@ async def select_task(id: int, session: AsyncSession) -> Task:
         print(f"An error occurred while selecting task: {e}")
         return None
 
+
+async def select_task_id(id: int, session: AsyncSession) -> bool:
+    try:
+        statement = select(Task).where(Task.id == id)
+        task = await session.scalar(statement)
+
+        if not task:
+            print(f"No task found with ID: {id}")
+            return False
+
+        return True
+    except Exception as e:
+        print(f"An error occurred while selecting task: {e}")
+        return False
 
 async def owner(id: int, owner: str, session: AsyncSession) -> bool:
     try:

@@ -18,7 +18,6 @@ app.include_router(login_router)
 app.include_router(task_router)
 app.include_router(user_router)
 
-
 @app.get('/admin')
 async def get_admin(token: str = Depends(role_required('admin'))):
     return {"message": "This is the admin resource", "user": f'{token}'}

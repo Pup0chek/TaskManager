@@ -8,7 +8,7 @@ from src.models import Task_py
 from database.models import Task
 from src.Token import Token
 from database.connect_to_db import async_session
-from database.actions.with_task import select_task_bool, select_task, create_task, update_task, owner
+from database.actions.with_task import select_task_id, select_task, create_task, update_task, owner
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
@@ -95,20 +95,32 @@ async def put_task(task: Task_py):
 
 
 @task_router.delete("/")
-async def delete_task(task: Task_py, authorization: str = Header(...)):
+async def delete_task(id: int, authorization: str = Header(...)):
     async with async_session() as session:
         try:
+            # Проверяем авторизацию
             if authorization.startswith("Bearer "):
                 token = authorization[7:]
+            else:
+                return {"message": "Authorization header is invalid."}
+
             payload = Token.decode_token(token)
             owner = payload.get("user")
 
+            # Проверяем токен
             if await valid_token(owner, token, session):
-                success = await select_task_bool(task.name, session)
+                # Проверяем, существует ли задача
+                success = await select_task_id(id, session)
                 if not success:
-                    return {"message": f"Task with name '{task.name}' not found."}
-                await delete_task(task.name, session)
-                return {"message": f"Task '{task.name}' deleted successfully."}
+                    return {"message": f"Task with ID '{id}' not found."}
+
+                # Удаляем задачу
+                deleted = await delete_task(id, session)
+                await session.commit()
+                if deleted:
+                    return {"message": f"Task with ID '{id}' deleted successfully."}
+                else:
+                    return {"message": f"Task with ID '{id}' could not be deleted."}
             else:
                 return {"message": "Your token is invalid or expired."}
         except Exception as e:
