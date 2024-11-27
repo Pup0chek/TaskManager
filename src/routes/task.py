@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Header, HTTPException, Depends
 from fastapi.openapi.models import Response
 from starlette import status
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,6 +16,8 @@ task_router = APIRouter(prefix='/task', tags=['Task'])
 class CustomException(HTTPException):
     def __init__(self, detail: str, status_code: int = 401):
         super().__init__(status_code=status_code, detail=detail)
+
+
 
 
 @task_router.get("/{id}")
@@ -95,10 +97,9 @@ async def put_task(task: Task_py):
 
 
 @task_router.delete("/")
-async def delete_task(id: int, authorization: str = Header(...)):
+async def delete_task(id: int, authorization: str):
     async with async_session() as session:
         try:
-            # Проверяем авторизацию
             if authorization.startswith("Bearer "):
                 token = authorization[7:]
             else:
@@ -107,14 +108,11 @@ async def delete_task(id: int, authorization: str = Header(...)):
             payload = Token.decode_token(token)
             owner = payload.get("user")
 
-            # Проверяем токен
             if await valid_token(owner, token, session):
-                # Проверяем, существует ли задача
                 success = await select_task_id(id, session)
                 if not success:
                     return {"message": f"Task with ID '{id}' not found."}
 
-                # Удаляем задачу
                 deleted = await delete_task(id, session)
                 await session.commit()
                 if deleted:

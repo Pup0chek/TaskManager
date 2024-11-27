@@ -1,5 +1,5 @@
 import jwt
-from fastapi import HTTPException
+from fastapi import HTTPException, Header
 from datetime import datetime, timedelta
 from database.actions.with_token import add_token
 
@@ -13,9 +13,9 @@ class Token:
         return token
 
     @staticmethod
-    def decode_token(token: str):
+    def decode_token(authorization: str):
         try:
-            payload = jwt.decode(token, key='hahahahhahaa', algorithms=['HS256'])
+            payload = jwt.decode(authorization, key='hahahahhahaa', algorithms=['HS256'])
             print(payload)
             #data = payload.get('user')
             return payload
@@ -30,8 +30,8 @@ class Token:
                 detail=f"{e}"
             )
     @staticmethod
-    def get_role(token:str):
-        payload = jwt.decode(token, key='hahahahhahaa', algorithms=['HS256'])
+    def get_role(authorization:str):
+        payload = jwt.decode(authorization, key='hahahahhahaa', algorithms=['HS256'])
         role= payload.get('role')
         return role
 
