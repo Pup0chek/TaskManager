@@ -1,7 +1,12 @@
+import aioredis
+
 from database.models import Task, User, Token_validation
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_session
 
+
+async def redis_client():
+    return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
 
 async def add_token(user: str, token: str, session: AsyncSession):
     try:
@@ -44,3 +49,10 @@ async def valid_token(user: str, token: str, session: AsyncSession) -> bool:
     except Exception as e:
         print(f"An error occurred while validating the token: {e}")
         return False
+
+async def valid_cache(user: str, token: str):
+    client = await redis_client()
+    token1 = await client.get(f"access:user:{user}")
+    if token1.decode('utf-8') == token:
+        return True
+    return False

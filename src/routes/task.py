@@ -3,7 +3,7 @@ from fastapi.openapi.models import Response
 from starlette import status
 from fastapi.middleware.cors import CORSMiddleware
 
-from database.actions.with_token import valid_token
+from database.actions.with_token import valid_token, valid_cache
 from src.models import Task_py
 from database.models import Task
 from src.Token import Token
@@ -72,7 +72,11 @@ async def post_task(task: Task_py, authorization: str = Header(...)):
             owner = payload.get("user")
             print(payload)
 
-            if await valid_token(owner, token, session):
+            # if await valid_token(owner, token, session):
+            #     task1 = Task(name=task.name, description=task.description, owner=owner)
+            #     await create_task(task1, session)
+            #     return {"message": "success"}
+            if await valid_cache(owner, token):
                 task1 = Task(name=task.name, description=task.description, owner=owner)
                 await create_task(task1, session)
                 return {"message": "success"}
