@@ -1,3 +1,4 @@
+import aioredis
 import uvicorn
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.openapi.utils import get_openapi
@@ -18,6 +19,9 @@ app.include_router(login_router)
 app.include_router(task_router)
 app.include_router(user_router)
 
+async def redis_client():
+    return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
+
 @app.get('/admin')
 async def get_admin(token: str = Depends(role_required('admin'))):
     return {"message": "This is the admin resource", "user": f'{token}'}
@@ -34,13 +38,15 @@ async def get_guest(token: str = Depends(role_required('guest'))):
 
 
 @app.post('/refresh')
-async def post_refresh_token(token: Refresh):
+async def post_refresh_token(token: Refresh, client=Depends(redis_client)):
     async with async_session() as session:
         try:
             access_token = Token.refresh(token.refresh_token)['access_token']
             payload = Token.decode_token(access_token).get('user')
             await add_token(payload, access_token, session)
-            return {"message": "Token refreshed successfully"}
+            await client.set(f'access:user:{payload}', access_token)
+            access = await client.get(f'access:user:{payload}')
+            return {"message": "Token refreshed successfully", "token": f"{access.decode('utf-8')}"}
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error refreshing token: {e}")
 
