@@ -1,5 +1,7 @@
 import aioredis
 import uvicorn
+from alembic import command
+from alembic.config import Config
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.openapi.utils import get_openapi
 from database.connect_to_db import async_session
@@ -21,6 +23,12 @@ app.include_router(user_router)
 
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
+
+@app.on_event("startup")
+async def startup():
+    # Применение миграций при старте приложения
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
 
 @app.get('/admin')
 async def get_admin(token: str = Depends(role_required('admin'))):
