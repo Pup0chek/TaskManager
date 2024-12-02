@@ -19,7 +19,7 @@ async def create_user(user: User, session: AsyncSession) -> str:
         return f"An error occurred while creating user: {e}"
 
 
-async def update_user(login: str, password: str, session: AsyncSession) -> bool:
+async def update_user(login: str, password: str, role:str, session: AsyncSession) -> bool:
     try:
         statement = select(User).where(User.login == login)
         user = await session.scalar(statement)
@@ -27,8 +27,9 @@ async def update_user(login: str, password: str, session: AsyncSession) -> bool:
             print(f"User with login '{login}' not found.")
             return False
 
-
+        user.login = login
         user.password = password
+        user.role = role
 
         await session.commit()
         print(f"User with login '{login}' was successfully updated.")

@@ -14,7 +14,7 @@ user_router = APIRouter(prefix="/user", tags=["User"])
 async def put_user(user: User_py):
     async with async_session() as session:
         try:
-            success = await update_user(user.login, user.password, session)
+            success = await update_user(user.login, user.password, user.role, session)
             if success:
                 return {"message": "User updated successfully."}
             else:

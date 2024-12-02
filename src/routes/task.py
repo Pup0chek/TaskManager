@@ -101,7 +101,7 @@ async def put_task(task: Task_py):
 
 
 @task_router.delete("/")
-async def delete_task(id: int, authorization: str):
+async def delete_task(id: int, authorization: str = Header(...)):
     async with async_session() as session:
         try:
             if authorization.startswith("Bearer "):

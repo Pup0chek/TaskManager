@@ -21,6 +21,10 @@ async def create_task(task: Task, session: AsyncSession) -> bool:
         return False
 
 
+
+
+
+
 async def update_task(name: str, description: str, session: AsyncSession) -> bool:
     try:
         statement = select(Task).where(Task.name == name)
@@ -31,6 +35,7 @@ async def update_task(name: str, description: str, session: AsyncSession) -> boo
             return False
 
         task.description = description
+        task.name = name
         await session.commit()
         print(f"Task with name '{name}' was successfully updated.")
         return True
