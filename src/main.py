@@ -24,11 +24,7 @@ app.include_router(user_router)
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
 
-@app.on_event("startup")
-async def startup():
-    # Применение миграций при старте приложения
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+
 
 @app.get('/admin')
 async def get_admin(token: str = Depends(role_required('admin'))):
