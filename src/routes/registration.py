@@ -7,7 +7,7 @@ from starlette.responses import HTMLResponse
 #from starlette.templating import Jinja2Templates
 
 import aioredis
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from urllib3 import request
 
 from src.models import User_py
@@ -65,7 +65,8 @@ async def post_registration(user: User_py, client=Depends(redis_client)):
         try:
             user_exists = await select_user(user.login, session)
             if user_exists:
-                return {"message": f"User with login '{user.login}' already exists."}
+                #return {"message": f"User with login '{user.login}' already exists."}
+                raise HTTPException(status_code=401, detail=f"User with login '{user.login}' already exists.")
             message = await create_user(user1, session)
             token_access = Token.create_access_token({'login': user.login, 'password': user.password})
             token_refresh = Token.create_refresh_token({"user": user.login, "role": user.role})
