@@ -3,30 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Main</title>
 </head>
 <body>
-    <h1>Login Form</h1>
-    <form id="login-form">
-        <label for="login">Login:</label>
-        <input type="text" id="login" name="login" required>
-        <br><br>
+    <h1>Main Page</h1>
+    <form id="main-page">
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br><br>
-
-
-        <button type="submit">Login</button>
+        <button type="submit">Create Task</button>
     </form>
 
     <script>
-        document.getElementById("login-form").addEventListener("submit", async function(event) {
+        document.getElementById("main-page").addEventListener("Create Task", async function(event) {
             event.preventDefault(); // Prevent default form submission
 
-            // Get form data
-            const login = document.getElementById("login").value;
-            const password = document.getElementById("password").value;
 
             // Create data object
             const data = {
@@ -46,12 +35,8 @@
 
                 const result = await response.json();
                 if (response.ok) {
-                    // Save tokens to sessionStorage
-                    sessionStorage.setItem('access_token', result.access_token);
-                    sessionStorage.setItem('refresh_token', result.refresh_token);
-
-                    // Redirect to main page
-                    window.location.href = "/main"; // Redirect after successful registration
+                    alert(`${result.message}`);
+                    console.log(result);
                 } else {
                     alert(`Error: ${result.message}`);
                     console.log(result);

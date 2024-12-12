@@ -53,8 +53,12 @@
 
                 const result = await response.json();
                 if (response.ok) {
-                    alert(`${result.message}`);
-                    console.log(result);
+                    // Save tokens to sessionStorage
+                    sessionStorage.setItem('access_token', result.access_token);
+                    sessionStorage.setItem('refresh_token', result.refresh_token);
+
+                    // Redirect to main page
+                    window.location.href = "/main"; // Redirect after successful registration
                 } else {
                     alert(`Error: ${result.message}`);
                     console.log(result);

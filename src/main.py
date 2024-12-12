@@ -1,12 +1,14 @@
+from tempfile import template
+
 import aioredis
 import uvicorn
 from alembic import command
 from alembic.config import Config
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Request
 from fastapi.openapi.utils import get_openapi
 from database.connect_to_db import async_session
 from database.actions.with_token import add_token
-
+from fastapi.templating import Jinja2Templates
 from src.routes.registration import registration_router
 from src.routes.login import login_router
 from src.routes.task import task_router
@@ -21,9 +23,16 @@ app.include_router(login_router)
 app.include_router(task_router)
 app.include_router(user_router)
 
+templates = Jinja2Templates(directory=".\\templates")
+
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
 
+
+@app.get('/main')
+async def get_main(request: Request):
+    template = templates.TemplateResponse('main.html', {"request":request})
+    return template
 
 
 @app.get('/admin')
