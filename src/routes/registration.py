@@ -1,7 +1,15 @@
 from hashlib import md5
 
+from fastapi.templating import Jinja2Templates
+
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import HTMLResponse
+#from starlette.templating import Jinja2Templates
+
 import aioredis
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
+from urllib3 import request
+
 from src.models import User_py
 from database.models import User
 from database.connect_to_db import async_session
@@ -10,7 +18,7 @@ from src.Token import Token
 from database.actions.with_token import add_token
 
 registration_router = APIRouter(prefix='/registration', tags=['Registration'])
-
+templates = Jinja2Templates(directory="C:\\Users\\AdminIS\\TaskManager\\templates")
 
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
@@ -21,19 +29,22 @@ async def cache_path(path: str, response_data: str):
         path_hash = md5(path.encode()).hexdigest()
         await r.set(path_hash, response_data, ex=3600)  # ex=3600 устанавливает срок жизни кеша на 1 час
 
-
 async def get_cached_path(path: str) -> str:
     async with async_session() as session:
         r = await redis_client()
         path_hash = md5(path.encode()).hexdigest()
         cached_data = await r.get(path_hash)
         return cached_data
+
+
 @registration_router.get("/")
-async def get_registration():
+async def get_registration(request : Request):
     async with async_session() as session:
         cached_data = await get_cached_path('/registration')
         if cached_data:
-            return {"path": '/registration', "cached": True, "data": cached_data}
+            json =  {"path": '/registration', "cached": True, "data": cached_data}
+            html = templates.TemplateResponse('registration.html', {"request": request, **json})
+            return html
 
         # Если кеша нет, генерируем ответ
         response_data = "Welcome to registration page!"
@@ -41,7 +52,9 @@ async def get_registration():
         # Сохраняем результат в кеш
         await cache_path('/registration', response_data)
 
-        return {"path": '/registration', "cached": False, "data": response_data}
+        json = {"path": '/registration', "cached": False, "data": response_data}
+        html = templates.TemplateResponse('registration.html', {"request":request, **json})
+        return html
 
 
 @registration_router.post("/")

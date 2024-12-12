@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+</head>
+<body>
+    <div class="container">
+        <h2>Register</h2>
+        <form action="/registration/" method="POST">
+            <div class="input-group">
+                <label for="login">Login</label>
+                <input type="text" id="login" name="login" placeholder="Enter your login" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <div class="input-group">
+                <label for="role">Role</label>
+                <input type="text" id="role" name="role" placeholder="Enter your role" required>
+            </div>
+            <button type="submit" class="btn">Register</button>
+        </form>
+        <div class="redirect-link">
+            <p>Already have an account? <a href="/login/">Login here</a></p>
+        </div>
+    </div>
+</body>
+</html>
