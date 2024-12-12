@@ -1,7 +1,8 @@
 from hashlib import md5
+
 from fastapi.templating import Jinja2Templates
 import aioredis
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from src.models import User_login
 from database.connect_to_db import async_session
 from database.actions.with_token import add_token
@@ -73,8 +74,10 @@ async def post_login(user: User_login, client = Depends(redis_client)):
                         "refresh_token": refresh.decode('utf-8'),
                     }
                 else:
-                    return {"message": "Password is incorrect"}
+                    raise HTTPException(status_code=401, detail=f"Password is incorrect.")
+                    #return {"message": "Password is incorrect"}
             else:
-                return {"message": f"There's no user with login '{user.login}'. Try a different one"}
+                raise HTTPException(status_code=401, detail=f"There's no user with login '{user.login}'. Try a different one")
+                #return {"message": f"There's no user with login '{user.login}'. Try a different one"}
         except Exception as e:
-            return {"message": f"An error occurred: {e}"}
+            raise e

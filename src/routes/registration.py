@@ -83,4 +83,5 @@ async def post_registration(user: User_py, client=Depends(redis_client)):
                 "refresh_token": refresh.decode('utf-8')
             }
         except Exception as e:
-            return {"message": f"An error occurred: {e}"}
+            raise e
+            #return {"message": f"An error occurred: {e}"}

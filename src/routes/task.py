@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Header, HTTPException, Depends
+from fastapi import APIRouter, Header, HTTPException, Depends, Request
 from fastapi.openapi.models import Response
-from starlette import status
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
 
 from database.actions.with_token import valid_token, valid_cache
+# from src.main import templates
 from src.models import Task_py
 from database.models import Task
 from src.Token import Token
@@ -12,6 +12,7 @@ from database.actions.with_task import select_task_id, select_task, create_task,
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
+tamplates = Jinja2Templates(directory=".\\templates")
 
 class CustomException(HTTPException):
     def __init__(self, detail: str, status_code: int = 401):
@@ -58,8 +59,31 @@ async def get_by_id(id: int, Authorization: str = Header(None)):
 
 
 @task_router.get("/")
-async def get_task(limit: int = 10):
-    return {"message": "Welcome to task creation page"}
+async def get_task(request, Request, authorization: str = Header(...)):
+    async with async_session() as session:
+        try:
+            if authorization.startswith("Bearer "):
+                token = authorization[7:]
+            payload = Token.decode_token(token)
+            owner = payload.get("user")
+            print(payload)
+
+            # if await valid_token(owner, token, session):
+            #     task1 = Task(name=task.name, description=task.description, owner=owner)
+            #     await create_task(task1, session)
+            #     return {"message": "success"}
+            if await valid_cache(owner, token):
+                json = {"message": "Valid"}
+                template = templates.TemplateResponse('creation.html', {"request":request, **json})
+                return template
+            json = {"message": "Your token is old"}
+            template = templates.TemplateResponse('creation.html', {"request": request, **json})
+            return template
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            return {"message": f"error: {e}"}
+
 
 
 @task_router.post("/")

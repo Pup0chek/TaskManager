@@ -60,7 +60,7 @@
                     // Redirect to main page
                     window.location.href = "/main"; // Redirect after successful registration
                 } else {
-                    alert(`Error: ${result.message}`);
+                    alert(`Error: ${result.detail}`);
                     console.log(result);
                 }
             } catch (error) {
