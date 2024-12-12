@@ -10,5 +10,48 @@
     <form id="main-page" action="/task/" method="GET">  <!-- Редирект на /tasks/ -->
         <button type="submit">Create Task</button>
     </form>
+    <br><br>
+    <form id="get-by-id">
+    <label for="id">Login:</label>
+        <input type="text" id="id" name="id" required>
+        <button type="submit">View Task by ID</button>
+        <br><br>
+        {{ id }}<br>
+        {{ name }}<br>
+        {{ description }}<br>
+    </form>
+    <script>
+        document.getElementById("get-by-id").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Get form data
+            const id = document.getElementById("id").value;
+
+
+
+            // Send POST request with JSON data
+            try {
+                const response = await fetch(`/task/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${sessionStorage.getItem('access_token')}`
+                    }
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+
+                    // Redirect to main page
+                    window.location.href = "/main"; // Redirect after successful registration
+                } else {
+                    alert(`Error: ${result.detail}`);
+                    console.log(result);
+                }
+            } catch (error) {
+                alert('Error');
+                console.log(error);
+            }
+        });
+    </script>
 </body>
 </html>

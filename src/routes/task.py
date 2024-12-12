@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Header, HTTPException, Depends, Request
 from fastapi.openapi.models import Response
 from fastapi.templating import Jinja2Templates
+from urllib3 import request
 
 from database.actions.with_token import valid_token, valid_cache
 # from src.main import templates
@@ -22,7 +23,7 @@ class CustomException(HTTPException):
 
 
 @task_router.get("/{id}")
-async def get_by_id(id: int, Authorization: str = Header(None)):
+async def get_by_id(request:Request, id: int, Authorization: str = Header(None)):
     if Authorization is None:
         raise CustomException(status_code=401, detail="Where's your token?")
 
@@ -32,16 +33,19 @@ async def get_by_id(id: int, Authorization: str = Header(None)):
                 token = Authorization[7:]
             payload = Token.decode_token(token)
             owner1 = payload.get("user")
-
+            print(payload)
+            print(owner1)
             if await owner(id, owner1, session):
                 if await valid_token(owner1, token, session):
                     success = await select_task(id, session)
                     if success:
-                        return {
+                        json= {
                             "id": f"{success.id}",
                             "name": f"{success.name}",
                             "description": f"{success.description}"
                         }
+                        template = templates.TemplateResponse('main.html', {"request":request, **json})
+                        return template
                     else:
                         return {"message": f"Task with id '{id}' not found."}
                 else:

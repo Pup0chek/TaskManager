@@ -18,7 +18,7 @@ async def cache_path(path: str, response_data: str):
     async with async_session() as session:
         r = await redis_client()
         path_hash = md5(path.encode()).hexdigest()
-        await r.set(path_hash, response_data, ex=3600)  # ex=3600 устанавливает срок жизни кеша на 1 час
+        await r.set(path_hash, response_data, ex=3600)
 
 templates = Jinja2Templates(directory=".\\templates")
 
@@ -39,10 +39,8 @@ async def get_login(request: Request):
             template = templates.TemplateResponse('login.html', {"request":request, **json})
             return template
 
-        # Если кеша нет, генерируем ответ
         response_data = "Welcome to login page!"
 
-        # Сохраняем результат в кеш
         await cache_path('/login', response_data)
 
         #return {"path": '/login', "cached": False, "data": response_data}

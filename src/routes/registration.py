@@ -27,7 +27,7 @@ async def cache_path(path: str, response_data: str):
     async with async_session() as session:
         r = await redis_client()
         path_hash = md5(path.encode()).hexdigest()
-        await r.set(path_hash, response_data, ex=3600)  # ex=3600 устанавливает срок жизни кеша на 1 час
+        await r.set(path_hash, response_data, ex=3600)
 
 async def get_cached_path(path: str) -> str:
     async with async_session() as session:
@@ -46,10 +46,8 @@ async def get_registration(request : Request):
             html = templates.TemplateResponse('registration.html', {"request": request, **json})
             return html
 
-        # Если кеша нет, генерируем ответ
         response_data = "Welcome to registration page!"
 
-        # Сохраняем результат в кеш
         await cache_path('/registration', response_data)
 
         json = {"path": '/registration', "cached": False, "data": response_data}
