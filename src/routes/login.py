@@ -1,7 +1,7 @@
 from hashlib import md5
-
+from fastapi.templating import Jinja2Templates
 import aioredis
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from src.models import User_login
 from database.connect_to_db import async_session
 from database.actions.with_token import add_token
@@ -19,6 +19,7 @@ async def cache_path(path: str, response_data: str):
         path_hash = md5(path.encode()).hexdigest()
         await r.set(path_hash, response_data, ex=3600)  # ex=3600 устанавливает срок жизни кеша на 1 час
 
+templates = Jinja2Templates(directory="C:\\Users\\AdminIS\\TaskManager\\templates")
 
 async def get_cached_path(path: str) -> str:
     async with async_session() as session:
@@ -28,11 +29,14 @@ async def get_cached_path(path: str) -> str:
         return cached_data
 
 @login_router.get("/")
-async def get_login():
+async def get_login(request: Request):
     async with async_session() as session:
         cached_data = await get_cached_path('/login')
         if cached_data:
-            return {"path": '/login', "cached": True, "data": cached_data}
+            #return {"path": '/login', "cached": True, "data": cached_data}
+            json = {"path": '/login', "cached": True, "data": cached_data}
+            template = templates.TemplateResponse('login.html', {"request":request, **json})
+            return template
 
         # Если кеша нет, генерируем ответ
         response_data = "Welcome to login page!"
@@ -40,7 +44,10 @@ async def get_login():
         # Сохраняем результат в кеш
         await cache_path('/login', response_data)
 
-        return {"path": '/login', "cached": False, "data": response_data}
+        #return {"path": '/login', "cached": False, "data": response_data}
+        json = {"path": '/login', "cached": False, "data": response_data}
+        template = templates.TemplateResponse('login.html', {"request": request, **json})
+        return template
 
 
 @login_router.post("/")

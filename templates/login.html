@@ -2,9 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
 </head>
 <body>
+    <h1>Login Form</h1>
+    <form id="login-form">
+        <label for="login">Login:</label>
+        <input type="text" id="login" name="login" required>
+        <br><br>
 
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br><br>
+
+
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Get form data
+            const login = document.getElementById("login").value;
+            const password = document.getElementById("password").value;
+
+            // Create data object
+            const data = {
+                login: login,
+                password: password
+            };
+
+            // Send POST request with JSON data
+            try {
+                const response = await fetch('/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(`${result.message}`);
+                    console.log(result);
+                } else {
+                    alert(`Error: ${result.message}`);
+                    console.log(result);
+                }
+            } catch (error) {
+                alert('Error while registering user');
+                console.log(error);
+            }
+        });
+    </script>
 </body>
 </html>
