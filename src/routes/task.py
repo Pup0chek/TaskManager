@@ -12,7 +12,7 @@ from database.actions.with_task import select_task_id, select_task, create_task,
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
-tamplates = Jinja2Templates(directory=".\\templates")
+templates = Jinja2Templates(directory=".\\templates")
 
 class CustomException(HTTPException):
     def __init__(self, detail: str, status_code: int = 401):
@@ -59,30 +59,34 @@ async def get_by_id(id: int, Authorization: str = Header(None)):
 
 
 @task_router.get("/")
-async def get_task(request, Request, authorization: str = Header(...)):
-    async with async_session() as session:
-        try:
-            if authorization.startswith("Bearer "):
-                token = authorization[7:]
-            payload = Token.decode_token(token)
-            owner = payload.get("user")
-            print(payload)
-
-            # if await valid_token(owner, token, session):
-            #     task1 = Task(name=task.name, description=task.description, owner=owner)
-            #     await create_task(task1, session)
-            #     return {"message": "success"}
-            if await valid_cache(owner, token):
-                json = {"message": "Valid"}
-                template = templates.TemplateResponse('creation.html', {"request":request, **json})
-                return template
-            json = {"message": "Your token is old"}
-            template = templates.TemplateResponse('creation.html', {"request": request, **json})
-            return template
-        except HTTPException as e:
-            raise e
-        except Exception as e:
-            return {"message": f"error: {e}"}
+async def get_task(request: Request):
+    # async with async_session() as session:
+    #     try:
+    #         if authorization.startswith("Bearer "):
+    #             token = authorization[7:]
+    #         payload = Token.decode_token(token)
+    #         owner = payload.get("user")
+    #         print(payload)
+    #
+    #         # if await valid_token(owner, token, session):
+    #         #     task1 = Task(name=task.name, description=task.description, owner=owner)
+    #         #     await create_task(task1, session)
+    #         #     return {"message": "success"}
+    #         if await valid_cache(owner, token):
+    #             json = {"message": "Valid"}
+    #             template = templates.TemplateResponse('creation.html', {"request":request, **json})
+    #             return template
+    #         json = {"message": "Your token is old"}
+    #         template = templates.TemplateResponse('creation.html', {"request": request, **json})
+    #         return template
+    #     except HTTPException as e:
+    #         raise e
+    #     except Exception as e:
+    #         #return {"message": f"error: {e}"}
+    #         raise e
+    json = {"message": "Your token is old"}
+    template = templates.TemplateResponse('creation.html', {"request": request, **json})
+    return template
 
 
 
@@ -106,9 +110,9 @@ async def post_task(task: Task_py, authorization: str = Header(...)):
                 return {"message": "success"}
             return {"message": "Your token is old"}
         except HTTPException as e:
-            raise e
+            raise HTTPException(status_code=401, detail=f"Error")
         except Exception as e:
-            return {"message": f"error: {e}"}
+            raise e
 
 
 @task_router.put("/")

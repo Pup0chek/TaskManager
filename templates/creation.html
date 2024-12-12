@@ -2,9 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creation</title>
 </head>
 <body>
+    <h1>Creation Form</h1>
+    <form id="creation-form"> <!-- изменено с login-form на creation-form -->
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br><br>
 
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" required>
+        <br><br>
+
+        <button type="submit">Create</button>
+    </form>
+
+    <script>
+        document.getElementById("creation-form").addEventListener("submit", async function(event) { // изменено с login-form на creation-form
+            event.preventDefault(); // Prevent default form submission
+
+            // Get form data
+            const name = document.getElementById("name").value;
+            const description = document.getElementById("description").value;
+
+            // Create data object
+            const data = {
+                name: name,
+                description: description
+            };
+
+            // Send POST request with JSON data
+            try {
+                const response = await fetch('/task/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('access_token')}` // исправлено двоеточие на пробел
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    window.location.href = "/main"; // Redirect after successful creation
+                    alert(`Task was created successfully!`);
+                } else {
+                    alert(`Error: ${result.detail}`);
+                    console.log(result);
+                }
+            } catch (error) {
+                alert('Error while creating task');
+                console.log(error);
+            }
+        });
+    </script>
 </body>
 </html>
