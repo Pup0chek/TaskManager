@@ -45,7 +45,7 @@ async def get_by_id(request:Request, id: int, Authorization: str = Header(None))
                             "description": f"{success.description}"
                         }
                         template = templates.TemplateResponse('main.html', {"request":request, **json})
-                        return template
+                        return json
                     else:
                         return {"message": f"Task with id '{id}' not found."}
                 else:
@@ -92,7 +92,8 @@ async def get_task(request: Request):
     template = templates.TemplateResponse('creation.html', {"request": request, **json})
     return template
 
-
+# @task_router.get("/task_view")
+# async def task()
 
 @task_router.post("/")
 async def post_task(task: Task_py, authorization: str = Header(...)):

@@ -11,25 +11,26 @@
         <button type="submit">Create Task</button>
     </form>
     <br><br>
+
     <form id="get-by-id">
-    <label for="id">Main</label>
+        <label for="id">Main</label>
         <input type="text" id="id" name="id" required>
         <button type="submit">View Task by ID</button>
         <br><br>
-        {{ id }}<br>
-        {{ name }}<br>
-        {{ description }}<br>
     </form>
+
+    <!-- Добавим блок для отображения данных задачи -->
+    <div id="task-data">
+        <p>ID: <span id="task-id"></span></p>
+        <p>Name: <span id="task-name"></span></p>
+        <p>Description: <span id="task-description"></span></p>
+    </div>
+
     <script>
         document.getElementById("get-by-id").addEventListener("submit", async function(event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
 
-            // Get form data
             const id = document.getElementById("id").value;
-
-
-
-            // Send POST request with JSON data
             try {
                 const response = await fetch(`/task/${id}`, {
                     method: 'GET',
@@ -38,17 +39,30 @@
                     }
                 });
 
-                const result = await response.json();
-                if (response.ok) {
+                const contentType = response.headers.get('content-type');
 
-                    // Redirect to main page
-                    window.location.href = "/main"; // Redirect after successful registration
+                if (contentType && contentType.includes('application/json')) {
+                    const result = await response.json();
+                    if (response.ok) {
+                        // Отображаем данные на странице
+                        document.getElementById('task-id').textContent = result.id;
+                        document.getElementById('task-name').textContent = result.name;
+                        document.getElementById('task-description').textContent = result.description;
+                    } else {
+                        alert(`Error: ${result.detail}`);
+                        console.log(result);
+                    }
+                } else if (contentType && contentType.includes('text/html')) {
+                    // Если вдруг вернется HTML, можно заменить содержимое страницы:
+                    const htmlText = await response.text();
+                    document.open();
+                    document.write(htmlText);
+                    document.close();
                 } else {
-                    alert(`Error: ${result.detail}`);
-                    console.log(result);
+                    alert("Unknown response type from server");
                 }
             } catch (error) {
-                alert('Error');
+                alert(`Error: ${error}, ${sessionStorage.getItem("access_token")}`);
                 console.log(error);
             }
         });
