@@ -44,7 +44,7 @@ async def get_by_id(request:Request, id: int, Authorization: str = Header(None))
                             "name": f"{success.name}",
                             "description": f"{success.description}"
                         }
-                        template = templates.TemplateResponse('main.html', {"request":request, **json})
+                        #template = templates.TemplateResponse('main.html', {"request":request, **json})
                         return json
                     else:
                         return {"message": f"Task with id '{id}' not found."}
