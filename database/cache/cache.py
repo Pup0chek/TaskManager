@@ -6,7 +6,7 @@ def redis_client():
 
 def main():
     r = redis_client()
-    print(r.get('/').decode('utf-8'))
+    print(r.get('access:user:stringg').decode('utf-8'))
 
 
 if __name__ == "__main__":

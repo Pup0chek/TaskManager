@@ -101,6 +101,8 @@ async def post_task(task: Task_py, authorization: str = Header(...)):
         try:
             if authorization.startswith("Bearer "):
                 token = authorization[7:]
+            else:
+                token = authorization
             payload = Token.decode_token(token)
             owner = payload.get("user")
             print(payload)
@@ -115,7 +117,7 @@ async def post_task(task: Task_py, authorization: str = Header(...)):
                 return {"message": "success"}
             return {"message": "Your token is old"}
         except HTTPException as e:
-            raise HTTPException(status_code=401, detail=f"Error")
+            raise HTTPException(status_code=401, detail=f"Error {e}")
         except Exception as e:
             raise e
 
