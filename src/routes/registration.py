@@ -42,7 +42,7 @@ async def get_registration(request : Request):
     async with async_session() as session:
         cached_data = await get_cached_path('/registration')
         if cached_data:
-            json =  {"path": '/registration', "cached": True, "data": cached_data}
+            json = {"path": '/registration', "cached": True, "data": cached_data}
             html = templates.TemplateResponse('registration.html', {"request": request, **json})
             return html
 
@@ -66,11 +66,12 @@ async def post_registration(user: User_py, client=Depends(redis_client)):
                 #return {"message": f"User with login '{user.login}' already exists."}
                 raise HTTPException(status_code=401, detail=f"User with login '{user.login}' already exists.")
             message = await create_user(user1, session)
-            token_access = Token.create_access_token({'login': user.login, 'password': user.password})
+            token_access = Token.create_access_token({'user': user.login, 'role': user.role})
             token_refresh = Token.create_refresh_token({"user": user.login, "role": user.role})
-            await add_token(user.login, token_access, session)
             await client.set(f'access:user:{user.login}', token_access, ex=3600)
             await client.set(f'refresh:user:{user.login}', token_refresh, ex=3600)
+            await add_token(user.login, token_access, session)
+
 
             access = await client.get(f'access:user:{user.login}')
             refresh = await client.get(f'refresh:user:{user.login}')

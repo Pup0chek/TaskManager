@@ -44,8 +44,13 @@ async def get_by_id(request:Request, id: int, Authorization: str = Header(None))
                             "name": f"{success.name}",
                             "description": f"{success.description}"
                         }
-                        template = templates.TemplateResponse('main.html', {"request":request, "id":json["id"], "name":["name"], "description":["description"]})
-                        return template
+
+                        # template = templates.TemplateResponse('main.html', {"request":request, "id":json["id"], "name":["name"], "description":["description"]})
+                        # return template
+
+                        #template = templates.TemplateResponse('main.html', {"request":request, **json})
+                        return json
+
                     else:
                         return {"message": f"Task with id '{id}' not found."}
                 else:
@@ -92,7 +97,8 @@ async def get_task(request: Request):
     template = templates.TemplateResponse('creation.html', {"request": request, **json})
     return template
 
-
+# @task_router.get("/task_view")
+# async def task()
 
 @task_router.post("/")
 async def post_task(task: Task_py, authorization: str = Header(...)):
@@ -100,6 +106,8 @@ async def post_task(task: Task_py, authorization: str = Header(...)):
         try:
             if authorization.startswith("Bearer "):
                 token = authorization[7:]
+            else:
+                token = authorization
             payload = Token.decode_token(token)
             owner = payload.get("user")
             print(payload)
@@ -114,7 +122,7 @@ async def post_task(task: Task_py, authorization: str = Header(...)):
                 return {"message": "success"}
             return {"message": "Your token is old"}
         except HTTPException as e:
-            raise HTTPException(status_code=401, detail=f"Error")
+            raise HTTPException(status_code=401, detail=f"Error {e}")
         except Exception as e:
             raise e
 
