@@ -14,24 +14,16 @@
     <br><br>
 
     <form id="get-by-id">
-<<<<<<< HEAD
     <label for="id">ID:</label>
-=======
         <label for="id">Main</label>
->>>>>>> 3ce44d41caf54c996df96d12eaa9436f6aa793ab
         <input type="text" id="id" name="id" required>
         <button type="submit">View Task</button>
-        <br><br>
-        {{ id }}<br>
-        {{ name }}<br>
-        {{ description }}<br>
+<!--        <br><br>-->
+<!--        {{ id }}<br>-->
+<!--        {{ name }}<br>-->
+<!--        {{ description }}<br>-->
     </form>
-    <form id="delete-by-id">
-    <label for="id1">ID:</label>
-        <input type="text" id="id1" name="id1" required>
-        <button type="submit">Delete Task</button>
-        <br><br>
-    </form>
+
 
     <!-- Добавим блок для отображения данных задачи -->
     <div id="task-data">
@@ -39,6 +31,13 @@
         <p>Name: <span id="task-name"></span></p>
         <p>Description: <span id="task-description"></span></p>
     </div>
+
+    <form id="delete-by-id">
+    <label for="id1">ID:</label>
+        <input type="text" id="id1" name="id1" required>
+        <button type="submit">Delete Task</button>
+        <br><br>
+    </form>
 
     <script>
         document.getElementById("get-by-id").addEventListener("submit", async function(event) {
