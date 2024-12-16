@@ -51,7 +51,7 @@ async def get_registration(request : Request):
         await cache_path('/registration', response_data)
 
         json = {"path": '/registration', "cached": False, "data": response_data}
-        html = templates.TemplateResponse('registration.html', {"request":request, **json})
+        html = templates.TemplateResponse('registration.html', {"request":request})
         return html
 
 

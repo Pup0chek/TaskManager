@@ -45,7 +45,7 @@ async def get_login(request: Request):
 
         #return {"path": '/login', "cached": False, "data": response_data}
         json = {"path": '/login', "cached": False, "data": response_data}
-        template = templates.TemplateResponse('login.html', {"request": request, **json})
+        template = templates.TemplateResponse('login.html', {"request": request})
         return template
 
 
