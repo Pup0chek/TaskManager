@@ -3,6 +3,8 @@ from hashlib import md5
 from fastapi.templating import Jinja2Templates
 import aioredis
 from fastapi import APIRouter, Depends, Request, HTTPException
+from urllib3 import request
+
 from src.models import User_login
 from database.connect_to_db import async_session
 from database.actions.with_token import add_token
@@ -50,7 +52,7 @@ async def get_login(request: Request):
 
 
 @login_router.post("/")
-async def post_login(user: User_login, client = Depends(redis_client)):
+async def post_login(user: User_login, request: Request, client = Depends(redis_client)):
     async with async_session() as session:
         try:
             user_exists = await select_user(user.login, session)
@@ -66,11 +68,13 @@ async def post_login(user: User_login, client = Depends(redis_client)):
 
                     access = await client.get(f'access:user:{user.login}')
                     refresh = await client.get(f'refresh:user:{user.login}')
-                    return {
+                    json =  {
                         "message": "success",
                         "access_token": access.decode('utf-8'),
                         "refresh_token": refresh.decode('utf-8'),
                     }
+                    template = templates.TemplateResponse('main.html', {"request":request, **json})
+                    return template
                 else:
                     raise HTTPException(status_code=401, detail=f"Password is incorrect.")
                     #return {"message": "Password is incorrect"}

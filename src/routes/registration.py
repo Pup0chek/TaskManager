@@ -56,7 +56,7 @@ async def get_registration(request : Request):
 
 
 @registration_router.post("/")
-async def post_registration(user: User_py, client=Depends(redis_client)):
+async def post_registration(user: User_py, request:Request, client=Depends(redis_client)):
     user1 = User(login=user.login, password=user.password, role=user.role)
 
     async with async_session() as session:
@@ -75,12 +75,14 @@ async def post_registration(user: User_py, client=Depends(redis_client)):
 
             access = await client.get(f'access:user:{user.login}')
             refresh = await client.get(f'refresh:user:{user.login}')
-
-            return {
+            json = {
                 "message": f"{message}",
                 "access_token": access.decode('utf-8'),
                 "refresh_token": refresh.decode('utf-8')
             }
+            template = templates.TemplateResponse("main.html", {"request":request, **json})
+            return template
+
         except Exception as e:
             raise e
             #return {"message": f"An error occurred: {e}"}
