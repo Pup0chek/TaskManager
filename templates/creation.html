@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Main page{% endblock %}
+{% block content %}
+    <h1>Creation Form</h1>
+    <form id="creation-form" method="post" action="/task/">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br><br>
 
-</body>
-</html>
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" required>
+        <br><br>
+
+        <button type="submit">Create</button>
+    </form>
+{% endblock %}

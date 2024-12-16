@@ -19,8 +19,83 @@ class CustomException(HTTPException):
     def __init__(self, detail: str, status_code: int = 401):
         super().__init__(status_code=status_code, detail=detail)
 
+@task_router.get("/create")
+async def get_by_id(request:Request, Authorization: str = Header(None)):
+    # if Authorization is None:
+    #     raise CustomException(status_code=401, detail="Where's your token?")
+
+    async with async_session() as session:
+        try:
+            # if Authorization.startswith("Bearer "):
+            #     token = Authorization[7:]
+            # payload = Token.decode_token(token)
+            # owner1 = payload.get("user")
+            # print(payload)
+            # print(owner1)
 
 
+
+            template = templates.TemplateResponse('creation.html', {"request":request})
+            return template
+
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=401,
+                detail=f"{e}"
+            )
+
+
+
+@task_router.get("/view")
+async def view(request: Request, Authorization: str = Header(None)):
+    # if Authorization is None:
+    #     raise CustomException(status_code=401, detail="Where's your token?")
+    async with async_session() as session:
+        try:
+            #Вернуть
+            # if Authorization.startswith("Bearer "):
+            #     token = Authorization[7:]
+            # payload = Token.decode_token(token)
+            # owner1 = payload.get("user")
+            # if await owner(id, owner1, session):
+            #     if await valid_token(owner1, token, session):
+
+
+
+
+                    # success = await select_task(id, session)
+                    # if success:
+                    #     json= {
+                    #         "id": f"{success.id}",
+                    #         "name": f"{success.name}",
+                    #         "description": f"{success.description}"
+                    #     }
+
+                        # template = templates.TemplateResponse('main.html', {"request":request, "id":json["id"], "name":["name"], "description":["description"]})
+                        # return template
+
+                    template = templates.TemplateResponse('view.html', {"request":request})
+                    return template
+
+                    # else:
+                    #     return {"message": f"Task with id '{id}' not found."}
+
+
+
+            #Вернуть
+            #     else:
+            #         return {"message": "Your token is old"}
+            # else:
+            #     raise HTTPException(
+            #         status_code=403,
+            #         detail=f"Permission denied"
+            #     )
+        except Exception as e:
+            raise HTTPException(
+                status_code=401,
+                detail=f"{e}"
+            )
 
 @task_router.get("/{id}")
 async def get_by_id(request:Request, id: int, Authorization: str = Header(None)):
@@ -68,7 +143,8 @@ async def get_by_id(request:Request, id: int, Authorization: str = Header(None))
 
 
 @task_router.get("/")
-async def get_task(request: Request):
+async def get_task(request: Request, id:int):
+
     # async with async_session() as session:
     #     try:
     #         if authorization.startswith("Bearer "):
@@ -93,9 +169,41 @@ async def get_task(request: Request):
     #     except Exception as e:
     #         #return {"message": f"error: {e}"}
     #         raise e
-    json = {"message": "Your token is old"}
-    template = templates.TemplateResponse('creation.html', {"request": request, **json})
-    return template
+
+
+
+    #Вернуть
+    # json = {"message": "Your token is old"}
+    # template = templates.TemplateResponse('creation.html', {"request": request, **json})
+    # return template
+
+
+
+    async with async_session() as session:
+        try:
+
+                    success = await select_task(id, session)
+                    if success:
+                        json= {
+                            "id": f"{success.id}",
+                            "name": f"{success.name}",
+                            "description": f"{success.description}"
+                        }
+
+                        # template = templates.TemplateResponse('main.html', {"request":request, "id":json["id"], "name":["name"], "description":["description"]})
+                        # return template
+
+                        template = templates.TemplateResponse('view.html', {"request":request, **json})
+                        return template
+
+                    else:
+                        return {"message": f"Task with id '{id}' not found."}
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=401,
+                detail=f"{e}"
+            )
 
 # @task_router.get("/task_view")
 # async def task()

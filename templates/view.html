@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}View task{% endblock %}
+{% block content %}
+    <h1>View task</h1>
+    <form id="get-by-id" method="get" action='/task'>
+        <label for="id">ID:</label>
+            <label id="id1" for="id">Main</label>
+            <input type="text" id="id" name="id" required>
+            <button type="submit">View Task</button>
+            <br><br>
+            {{ id }}<br>
+            {{ name }}<br>
+            {{ description }}<br>
+    </form>
+
+
+{% endblock %}
