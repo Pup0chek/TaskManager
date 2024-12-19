@@ -2,7 +2,7 @@
 {% block title %}Registration{% endblock %}
 {% block content %}
 <h1>Registration Form</h1>
-    <form id="registration-form" method="post" action="/registration/">
+    <form id="registration-form">
         <label for="login">Login:</label>
         <input type="text" id="login" name="login" required>
         <br><br>
@@ -19,4 +19,51 @@
     </form>
 
     <p>Already have an account? <a href="/login/">Login here</a></p>
+
+    <div id="message"></div>
+
+    <script>
+        document.getElementById('registration-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const login = document.getElementById('login').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+
+            // Prepare the data to be sent
+            const data = {
+                login: login,
+                password: password,
+                role: role
+            };
+
+            try {
+                const response = await fetch('/registration/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Store tokens in sessionStorage
+                    sessionStorage.setItem('access_token', result.access_token);
+                    sessionStorage.setItem('refresh_token', result.refresh_token);
+
+                    // Optionally, redirect to the main page or display a success message
+                    // window.location.href = '/main/';
+                    document.getElementById('message').innerText = result.message;
+                } else {
+                    // Handle errors (e.g., user already exists)
+                    document.getElementById('message').innerText = result.detail || 'An error occurred.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('message').innerText = 'An unexpected error occurred.';
+            }
+        });
+    </script>
 {% endblock %}
