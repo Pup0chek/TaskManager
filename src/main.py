@@ -24,7 +24,7 @@ app.include_router(task_router)
 app.include_router(user_router)
 
 templates = Jinja2Templates(directory=".\\templates")
-
+#try try try
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
 
