@@ -81,8 +81,8 @@ TaskManager — это современное приложение для упр
 
 ### 📥 **Шаг 1: Клонируйте репозиторий**
 ```bash
-git clone https://github.com/your-username/taskmanager.git
-cd taskmanager
+git clone https://github.com/Pup0chek/TaskManager.git
+cd TaskManager
 ```
 
 ### 🛠 **Шаг 2: Установите зависимости**
@@ -156,4 +156,4 @@ docker run -d -p 8000:8000 taskmanager
 ---
 
 **Автор:** Pup0chek (https://github.com/Pup0chek)  
-**Лицензия:** MIT
+
