@@ -5,6 +5,10 @@ class User_py(BaseModel):
     password: str
     role: str
 
+class MessagePayload(BaseModel):
+    topic: str
+    message: str
+
 class User_login(BaseModel):
     login: str
     password: str

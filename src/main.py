@@ -13,9 +13,10 @@ from src.routes.registration import registration_router
 from src.routes.login import login_router
 from src.routes.task import task_router
 from src.routes.user import user_router
-from src.models import Refresh
+from src.models import Refresh, MessagePayload
 from src.roles import role_required
 from src.Token import Token
+from confluent_kafka import Producer
 
 app = FastAPI()
 app.include_router(registration_router)
@@ -24,6 +25,22 @@ app.include_router(task_router)
 app.include_router(user_router)
 
 templates = Jinja2Templates(directory=".\\templates")
+
+
+producer_config = {
+    'bootstrap.servers': 'localhost:9092',
+    'security.protocol': 'PLAINTEXT'
+}
+# producer = Producer(producer_config)
+#
+# @app.post("/send")
+# async def send_message(message: MessagePayload):
+#     try:
+#         producer.produce(message.topic, message.message)
+#         producer.flush()
+#         return {"status": "Message sent successfully"}
+#     except Exception as e:
+#         return {"status": "Error", "details": str(e)}
 #try try try
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
@@ -88,5 +105,5 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 
-# if __name__ == "__main__":
-#     uvicorn.run('main:app', reload=True)
+if __name__ == "__main__":
+    uvicorn.run('main:app', reload=True)
