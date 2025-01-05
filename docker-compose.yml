@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+
+  web_task:
+    build: .
+    ports:
+      - 8000:8000
+    command: uvicorn src.main:app --host 0.0.0.0 --reload
+    volumes:
+      - .:/usr/src/app
+
+  worker_task:
+    build: .
+    command: celery -A src.worker.celery worker --loglevel=info --logfile=/var/log/celery.log
+    volumes:
+      - ./logs:/var/log
+    environment:
+      - CELERY_BROKER_URL=redis://taskmanager-redis_task-1:6379/0
+      - CELERY_RESULT_BACKEND=redis://taskmanager-redis_task-1:6379/0
+    depends_on:
+      - web_task
+      - redis_task
+
+  redis_task:
+    image: redis:7
+
+  dashboard_task:
+    build: .
+    command: celery --broker=redis://taskmanager-redis_task-1:6379/0 flower --port=5555
+    ports:
+      - 5556:5555
+    environment:
+      - CELERY_BROKER_URL=redis://taskmanager-redis_task-1:6379/0
+      - CELERY_RESULT_BACKEND=redis://taskmanager-redis_task-1:6379/0
+    depends_on:
+      - web_task
+      - redis_task
+      - worker_task

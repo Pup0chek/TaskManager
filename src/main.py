@@ -1,10 +1,15 @@
 from tempfile import template
 
+from celery.result import AsyncResult
+from starlette.responses import JSONResponse
+
+from src.worker import create_task, celery
+
 import aioredis
 import uvicorn
 from alembic import command
 from alembic.config import Config
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException, Request, Body
 from fastapi.openapi.utils import get_openapi
 from database.connect_to_db import async_session
 from database.actions.with_token import add_token
@@ -16,7 +21,37 @@ from src.routes.user import user_router
 from src.models import Refresh, MessagePayload
 from src.roles import role_required
 from src.Token import Token
-from confluent_kafka import Producer
+# import smtplib
+# from email.mime.text import MIMEText
+# from email.mime.multipart import MIMEMultipart
+#
+# # Конфигурация SMTP-сервера
+# SMTP_SERVER = "smtp.gmail.com"  # Адрес SMTP-сервера (например, для Gmail)
+# SMTP_PORT = 587                 # Порт для SMTP (587 для TLS, 465 для SSL)
+# EMAIL_ADDRESS = "martynovaliya@gmail.com"  # Ваш email
+# EMAIL_PASSWORD = "Almaty111"
+
+# try:
+#         # Создаем сообщение
+#         message = MIMEMultipart()
+#         message["From"] = EMAIL_ADDRESS
+#         message["To"] = to_email
+#         message["Subject"] = subject
+#
+#         # Добавляем текст письма
+#         message.attach(MIMEText(body, "plain"))
+#
+#         # Подключение к SMTP-серверу
+#         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+#             server.starttls()  # Начинаем шифрованное соединение
+#             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)  # Входим в аккаунт
+#             server.sendmail(EMAIL_ADDRESS, to_email, message.as_string())  # Отправляем письмо
+#
+#         print(f"Письмо успешно отправлено на {to_email}")
+#     except Exception as e:
+#         print(f"Ошибка при отправке письма: {e}")
+
+#from confluent_kafka import Producer
 
 app = FastAPI()
 app.include_router(registration_router)
@@ -45,6 +80,27 @@ producer_config = {
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
 
+# @app.post('/mail')
+# async def send_mail(payload = Body(...)):
+#     text = payload['text']
+#     create_task(text)
+#     return {"message": "success"}
+
+@app.post("/tasks", status_code=201)
+def run_task(payload = Body(...)):
+    task_type = payload["type"]
+    task = create_task.delay(int(task_type))
+    return JSONResponse({"task_id": task.id})
+
+@app.get("/tasks/{task_id}")
+def get_status(task_id):
+    task_result = AsyncResult(task_id, app=celery)
+    result = {
+        "task_id": task_id,
+        "task_status": task_result.status,
+        "task_result": task_result.result
+    }
+    return JSONResponse(result)
 
 @app.get('/main')
 async def get_main(request: Request):

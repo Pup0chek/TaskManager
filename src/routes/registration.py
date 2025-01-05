@@ -2,13 +2,13 @@ from hashlib import md5
 
 from fastapi.templating import Jinja2Templates
 
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import HTMLResponse
+# from starlette.middleware.base import BaseHTTPMiddleware
+# from starlette.responses import HTMLResponse
 #from starlette.templating import Jinja2Templates
 
 import aioredis
 from fastapi import APIRouter, Depends, Request, HTTPException
-from urllib3 import request
+
 
 from src.models import User_py
 from database.models import User

@@ -1,0 +1,7 @@
+[2025-01-05 14:52:05,142: INFO/MainProcess] Connected to redis://taskmanager-redis_task-1:6379/0
+[2025-01-05 14:52:05,148: INFO/MainProcess] mingle: searching for neighbors
+[2025-01-05 14:52:06,159: INFO/MainProcess] mingle: all alone
+[2025-01-05 14:52:06,192: INFO/MainProcess] celery@e4052b4b8d0c ready.
+[2025-01-05 14:52:10,056: INFO/MainProcess] Events of group {task} enabled by remote.
+[2025-01-05 14:52:11,996: INFO/MainProcess] Task create_task[9d3a711c-cc0b-46cc-8592-3354837e85e7] received
+[2025-01-05 14:52:22,022: INFO/ForkPoolWorker-7] Task create_task[9d3a711c-cc0b-46cc-8592-3354837e85e7] succeeded in 10.019633969997813s: True
