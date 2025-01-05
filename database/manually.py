@@ -17,3 +17,4 @@ with async_session() as session:
         raise
     else:
         session.commit()
+

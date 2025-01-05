@@ -21,35 +21,7 @@ from src.routes.user import user_router
 from src.models import Refresh, MessagePayload
 from src.roles import role_required
 from src.Token import Token
-# import smtplib
-# from email.mime.text import MIMEText
-# from email.mime.multipart import MIMEMultipart
-#
-# # Конфигурация SMTP-сервера
-# SMTP_SERVER = "smtp.gmail.com"  # Адрес SMTP-сервера (например, для Gmail)
-# SMTP_PORT = 587                 # Порт для SMTP (587 для TLS, 465 для SSL)
-# EMAIL_ADDRESS = "martynovaliya@gmail.com"  # Ваш email
-# EMAIL_PASSWORD = "Almaty111"
 
-# try:
-#         # Создаем сообщение
-#         message = MIMEMultipart()
-#         message["From"] = EMAIL_ADDRESS
-#         message["To"] = to_email
-#         message["Subject"] = subject
-#
-#         # Добавляем текст письма
-#         message.attach(MIMEText(body, "plain"))
-#
-#         # Подключение к SMTP-серверу
-#         with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-#             server.starttls()  # Начинаем шифрованное соединение
-#             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)  # Входим в аккаунт
-#             server.sendmail(EMAIL_ADDRESS, to_email, message.as_string())  # Отправляем письмо
-#
-#         print(f"Письмо успешно отправлено на {to_email}")
-#     except Exception as e:
-#         print(f"Ошибка при отправке письма: {e}")
 
 #from confluent_kafka import Producer
 
