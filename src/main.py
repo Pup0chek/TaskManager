@@ -60,8 +60,11 @@ async def redis_client():
 
 @app.post("/tasks", status_code=201)
 def run_task(payload = Body(...)):
-    task_type = payload["type"]
-    task = create_task.delay(int(task_type))
+    mail = payload["mail"]
+    topic = payload["topic"]
+    text = payload["text"]
+
+    task = create_task.delay(mail, topic, text)
     return JSONResponse({"task_id": task.id})
 
 @app.get("/tasks/{task_id}")
