@@ -13,7 +13,7 @@ from database.actions.with_task import select_task_id, select_task, create_task,
 
 task_router = APIRouter(prefix='/task', tags=['Task'])
 
-templates = Jinja2Templates(directory=".\\templates")
+templates = Jinja2Templates(directory="templates")
 
 class CustomException(HTTPException):
     def __init__(self, detail: str, status_code: int = 401):

@@ -7,8 +7,6 @@ from src.worker import create_task, celery
 
 import aioredis
 import uvicorn
-from alembic import command
-from alembic.config import Config
 from fastapi import FastAPI, Depends, HTTPException, Request, Body
 from fastapi.openapi.utils import get_openapi
 from database.connect_to_db import async_session
@@ -18,10 +16,9 @@ from src.routes.registration import registration_router
 from src.routes.login import login_router
 from src.routes.task import task_router
 from src.routes.user import user_router
-from src.models import Refresh, MessagePayload
+from src.models import Refresh
 from src.roles import role_required
 from src.Token import Token
-
 
 #from confluent_kafka import Producer
 
@@ -31,13 +28,14 @@ app.include_router(login_router)
 app.include_router(task_router)
 app.include_router(user_router)
 
-templates = Jinja2Templates(directory=".\\templates")
+templates = Jinja2Templates(directory="templates")
 
 
 producer_config = {
     'bootstrap.servers': 'localhost:9092',
     'security.protocol': 'PLAINTEXT'
 }
+
 # producer = Producer(producer_config)
 #
 # @app.post("/send")
@@ -48,15 +46,11 @@ producer_config = {
 #         return {"status": "Message sent successfully"}
 #     except Exception as e:
 #         return {"status": "Error", "details": str(e)}
-#try try try
+
+
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)
 
-# @app.post('/mail')
-# async def send_mail(payload = Body(...)):
-#     text = payload['text']
-#     create_task(text)
-#     return {"message": "success"}
 
 @app.post("/tasks", status_code=201)
 def run_task(payload = Body(...)):
@@ -67,6 +61,7 @@ def run_task(payload = Body(...)):
     task = create_task.delay(mail, topic, text)
     return JSONResponse({"task_id": task.id})
 
+
 @app.get("/tasks/{task_id}")
 def get_status(task_id):
     task_result = AsyncResult(task_id, app=celery)
@@ -76,6 +71,7 @@ def get_status(task_id):
         "task_result": task_result.result
     }
     return JSONResponse(result)
+
 
 @app.get('/main')
 async def get_main(request: Request):

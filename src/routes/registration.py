@@ -18,7 +18,7 @@ from src.Token import Token
 from database.actions.with_token import add_token
 
 registration_router = APIRouter(prefix='/registration', tags=['Registration'])
-templates = Jinja2Templates(directory=".\\templates")
+templates = Jinja2Templates(directory="templates")
 
 async def redis_client():
     return await aioredis.StrictRedis(host="localhost", port="6379", db=0)

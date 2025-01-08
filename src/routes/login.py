@@ -20,7 +20,7 @@ async def cache_path(path: str, response_data: str):
         path_hash = md5(path.encode()).hexdigest()
         await r.set(path_hash, response_data, ex=3600)
 
-templates = Jinja2Templates(directory=".\\templates")
+templates = Jinja2Templates(directory="templates")
 
 async def get_cached_path(path: str) -> str:
     async with async_session() as session:
